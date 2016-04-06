@@ -1,0 +1,50 @@
+{
+  "name": "trailpack-sequelize",
+  "version": "0.0.0",
+  "description": "Sequelize.js Trailpack http://sequelizejs.com",
+  "homepage": "https://github.com/jaumard/trailpack-sequelize",
+  "author": {
+    "name": "Jimmy Aumard",
+    "email": "jimmy.aumard@gmail.com",
+    "url": "https://github.com/jaumard"
+  },
+  "main": "index.js",
+  "keywords": [
+    "trailpack",
+    "trails",
+    "trailjs",
+    "sequelize",
+    "orm",
+    "datastore",
+    "database"
+  ],
+  "dependencies": {
+    "joi": "^8.0.5",
+    "lodash": "^4.7.0",
+    "sequelize": "^3.20.0",
+    "trailpack-datastore": "^1.0.0",
+    "trails-service": "^1.0.0-beta-2"
+  },
+  "devDependencies": {
+    "eslint": "^2.6.0",
+    "eslint-config-trails": "^1.0.4",
+    "mocha": "^2.4.5",
+    "mysql": "^2.10.2",
+    "smokesignals": "^1.0.3",
+    "sqlite3": "^3.1.3",
+    "trailpack-core": "^1.0.0-beta-6",
+    "trails": "^1.0.0-beta-7",
+    "trails-model": "^1.0.0-beta-2"
+  },
+  "scripts": {
+    "test": "eslint --fix . && mocha"
+  },
+  "engines": {
+    "node": ">= 4.0.0"
+  },
+  "eslintConfig": {
+    "extends": "trails"
+  },
+  "repository": "https://github.com/jaumard/trailpack-sequelize",
+  "private": true
+}
