@@ -44,6 +44,11 @@ module.exports = class SequelizeTrailpack extends Trailpack {
       })
     })
 
+    _.each(this.models, (model, modelName) => {
+      if (this.orm[model.globalId].associate)
+        this.orm[model.globalId].associate(this.orm)
+    })
+
     this.app.orm = this.orm
 
     return this.migrate()
@@ -73,10 +78,10 @@ module.exports = class SequelizeTrailpack extends Trailpack {
     return Promise.all(
       _.map(this.models, model => {
         if (model.migrate == 'drop') {
-          return SchemaMigrationService.drop(this.orm[model.globalId])
+          return SchemaMigrationService.dropModel(this.orm[model.globalId])
         }
         else if (model.migrate == 'alter') {
-          return SchemaMigrationService.alter(this.orm[model.globalId])
+          return SchemaMigrationService.alterModel(this.orm[model.globalId])
         }
       })
     )

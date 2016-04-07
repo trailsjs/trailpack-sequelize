@@ -13,17 +13,28 @@ module.exports = _.defaultsDeep({
     models: {
       User: class User extends Model {
         static config() {
+          return {
+            options: {
+              classMethods: {
+                associate: (models) => {
+                  models.User.hasMany(models.Role, {
+                    as: 'roles',
+                    onDelete: 'CASCADE',
+                    foreignKey: {
+                      allowNull: true
+                    }
+                  })
+                }
+              }
+            }
+          }
         }
 
         static schema() {
           return {
             name: Sequelize.STRING,
             password: Sequelize.STRING,
-            displayName: Sequelize.STRING/*,
-            roles: {
-              collection: 'Role',
-              via: 'user'
-            }*/
+            displayName: Sequelize.STRING
           }
         }
       },
@@ -31,16 +42,27 @@ module.exports = _.defaultsDeep({
         static config() {
           return {
             store: 'storeoverride',
-            options: {}
+            options: {
+              classMethods: {
+                associate: function (models) {
+                  models.Role.belongsTo(models.User, {
+                    onDelete: 'CASCADE',
+                    foreignKey: {
+                      allowNull: true
+                    }
+                  })
+                }
+              }
+            }
           }
         }
 
         static schema() {
           return {
             name: Sequelize.STRING/*,
-            user: {
-              model: 'User'
-            }*/
+             user: {
+             model: 'User'
+             }*/
           }
         }
       },
@@ -48,6 +70,7 @@ module.exports = _.defaultsDeep({
         static config() {
           return {
             options: {
+
               hooks: {
                 beforeCreate: (values, options) => {
                   if (values.dataValues.beforeCreate === 0)
