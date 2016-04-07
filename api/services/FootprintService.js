@@ -41,31 +41,23 @@ module.exports = class FootprintService extends Service {
       options = {}
     }
     if (!_.isPlainObject(criteria) || options.findOne === true) {
-      query = Model.findById(criteria)
+      if (options.findOne === true) {
+        query = Model.find(criteria)
+      }
+      else {
+        query = Model.findById(criteria)
+      }
+
     }
     else {
       if (modelOptions.defaultLimit) {
-        query = Model.find(_.defaults(criteria, {
+        query = Model.findAll(_.defaults(criteria, {
           limit: modelOptions.defaultLimit
         }))
       }
       else {
-        query = Model.find(criteria)
+        query = Model.findAll(criteria)
       }
-    }
-
-    if (_.isString(modelOptions.populate)) {
-      query = query.populate(modelOptions.populate)
-    }
-    else {
-      _.each(modelOptions.populate, association => {
-        if (_.isString(association)) {
-          query = query.populate(association)
-        }
-        else {
-          query = query.populate(association.attribute, association.criteria || {})
-        }
-      })
     }
 
     return query
@@ -88,16 +80,16 @@ module.exports = class FootprintService extends Service {
 
     if (_.isPlainObject(criteria)) {
       if (modelOptions.defaultLimit) {
-        query = Model.update(_.defaults(criteria, {
+        query = Model.update(values, _.defaults(criteria, {
           limit: modelOptions.defaultLimit
-        }), values)
+        }))
       }
       else {
-        query = Model.update(criteria, values)
+        query = Model.update(values, criteria)
       }
     }
     else {
-      query = Model.update(criteria, values).then(results => results[0])
+      query = Model.update(values, criteria).then(results => results[0])
     }
 
     return query

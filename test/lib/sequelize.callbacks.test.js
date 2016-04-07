@@ -11,7 +11,11 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   describe('#beforeCreate', () => {
     it('should create a record with beforeCreate attribute set', () => {
       //FootprintService.destroy('ModelCallbacks',{})
-      return FootprintService.create('ModelCallbacks', { name: 'trails_beforeCreate', beforeCreate: 0, beforeValidate: 0 })
+      return FootprintService.create('ModelCallbacks', {
+          name: 'trails_beforeCreate',
+          beforeCreate: 0,
+          beforeValidate: 0
+        })
         .then(record => {
           assert.equal(record.beforeCreate, 1)
         })
@@ -20,7 +24,7 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   describe('#afterCreate', () => {
     it('should create a record with afterCreate attribute set', () => {
       //FootprintService.destroy('ModelCallbacks',{})
-      return FootprintService.create('ModelCallbacks', { name: 'trails_afterCreate', beforeValidate: 0, afterCreate: 0 })
+      return FootprintService.create('ModelCallbacks', {name: 'trails_afterCreate', beforeValidate: 0, afterCreate: 0})
         .then(record => {
           assert.equal(record.afterCreate, 1)
         })
@@ -28,13 +32,21 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   })
   describe('#beforeUpdate', () => {
     it('beforeUpdate should be called', () => {
-      return FootprintService.create('ModelCallbacks', { name: 'trails_beforeUpdate', beforeCreate: 0, beforeValidate: 0 })
+      return FootprintService.create('ModelCallbacks', {
+          name: 'trails_beforeUpdate',
+          beforeCreate: 0,
+          beforeValidate: 0
+        })
         .then(record => {
           return FootprintService.update(
             'ModelCallbacks',
-            { name: 'trails_beforeUpdate' },
-            { name: 'trails_UpdatedBefore', beforeValidate: 0, beforeUpdate: 0 }
+            {where: {name: 'trails_beforeUpdate'}},
+            {name: 'trails_UpdatedBefore', beforeValidate: 0, beforeUpdate: 0}
           )
+        })
+        .then(records => {
+          assert.equal(records[0], 1);
+          return FootprintService.find('ModelCallbacks', {where: {name: 'trails_UpdatedBefore'}})
         })
         .then(records => {
           assert.equal(records[0].beforeUpdate, 1)
@@ -43,13 +55,17 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   })
   describe('#afterUpdate', () => {
     it('beforeUpdate should be called', () => {
-      return FootprintService.create('ModelCallbacks', { name: 'trails_afterUpdate', beforeValidate: 0 })
+      return FootprintService.create('ModelCallbacks', {name: 'trails_afterUpdate', beforeValidate: 0})
         .then(record => {
           return FootprintService.update(
             'ModelCallbacks',
-            { name: 'trails_afterUpdate' },
-            { name: 'trails_UpdatedAfter', beforeValidate: 0, afterUpdate: 0  }
+            {where: {name: 'trails_afterUpdate'}},
+            {name: 'trails_UpdatedAfter', beforeValidate: 0, afterUpdate: 0}
           )
+        })
+        .then(results => {
+          assert.equal(results[0], 1);
+          return FootprintService.find('ModelCallbacks', {where: {name: 'trails_afterUpdate'}})
         })
         .then(records => {
           assert.equal(records[0].afterUpdate, 1)
@@ -58,7 +74,7 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   })
   describe('#beforeValidate', () => {
     it('should create a record with a beforeValidate attribute', () => {
-      return FootprintService.create('ModelCallbacks', { name: 'trails_beforeCreate', beforeValidate: 0 })
+      return FootprintService.create('ModelCallbacks', {name: 'trails_beforeCreate', beforeValidate: 0})
         .then(record => {
           assert.equal(record.beforeValidate, 1)
         })
@@ -66,7 +82,11 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   })
   describe('#afterValidate', () => {
     it('should create a record with a afterValidate attribute', () => {
-      return FootprintService.create('ModelCallbacks', { name: 'trails_afterCreate', beforeValidate: 0, afterValidate: 0 })
+      return FootprintService.create('ModelCallbacks', {
+          name: 'trails_afterCreate',
+          beforeValidate: 0,
+          afterValidate: 0
+        })
         .then(record => {
           assert.equal(record.afterValidate, 1)
         })
@@ -74,12 +94,12 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   })
   describe('#beforeDestroy', () => {
     it('should call the beforeDestroy callback and continue', () => {
-      return FootprintService.create('ModelCallbacks', { name: 'trails_beforeDestroy', beforeValidate: 0 })
+      return FootprintService.create('ModelCallbacks', {name: 'trails_beforeDestroy', beforeValidate: 0})
         .then(record => {
-          return FootprintService.destroy('ModelCallbacks', { name: 'trails_beforeDestroy' })
+          return FootprintService.destroy('ModelCallbacks', {where: {name: 'trails_beforeDestroy'}})
         })
         .then(records => {
-          return FootprintService.find('ModelCallbacks', { name: 'trails_beforeDestroy' })
+          return FootprintService.find('ModelCallbacks', {where: {name: 'trails_beforeDestroy'}})
         })
         .then(records => {
           assert.equal(records.length, 0)
@@ -88,12 +108,12 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   })
   describe('#afterDestroy', () => {
     it('should call the afterDestroy callback and continue', () => {
-      return FootprintService.create('ModelCallbacks', { name: 'trails_afterDestroy', beforeValidate: 0 })
+      return FootprintService.create('ModelCallbacks', {name: 'trails_afterDestroy', beforeValidate: 0})
         .then(record => {
-          return FootprintService.destroy('ModelCallbacks', { name: 'trails_afterDestroy' })
+          return FootprintService.destroy('ModelCallbacks', {where: {name: 'trails_afterDestroy'}})
         })
         .then(records => {
-          return FootprintService.find('ModelCallbacks', { name: 'trails_afterDestroy' })
+          return FootprintService.find('ModelCallbacks', {where: {name: 'trails_afterDestroy'}})
         })
         .then(records => {
           assert.equal(records.length, 0)

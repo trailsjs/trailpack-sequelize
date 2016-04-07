@@ -50,22 +50,28 @@ module.exports = _.defaultsDeep({
             options: {
               hooks: {
                 beforeCreate: (values, options) => {
-                  values.dataValues.beforeCreate += 1;
+                  if (values.dataValues.beforeCreate === 0)
+                    values.beforeCreate += 1;
                 },
                 afterCreate: function (values, options) {
-                  values.dataValues.afterCreate += 1;
+                  if (values.dataValues.afterCreate === 0)
+                    values.afterCreate += 1;
                 },
                 beforeUpdate: function (values, options) {
-                  values.dataValues.beforeUpdate += 1;
+                  if (values.dataValues.beforeUpdate === 0)
+                    values.beforeUpdate += 1;
                 },
                 afterUpdate: function (values, options) {
-                  values.dataValues.afterUpdate += 1;
+                  if (values.dataValues.afterUpdate === 0)
+                    values.afterUpdate += 1;
                 },
                 beforeValidate: function (values, options) {
-                  values.dataValues.beforeValidate += 1;
+                  if (values.dataValues.beforeValidate === 0)
+                    values.beforeValidate += 1;
                 },
                 afterValidate: function (values, options) {
-                  values.dataValues.afterValidate += 1;
+                  if (values.dataValues.afterValidate === 0)
+                    values.afterValidate += 1;
                 },
                 beforeDestroy: function (values, options) {
 
