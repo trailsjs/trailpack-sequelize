@@ -80,6 +80,14 @@ module.exports = _.defaultsDeep({
                   if (values.dataValues.afterCreate === 0)
                     values.afterCreate += 1;
                 },
+                beforeBulkUpdate: (values)=> {
+                  if (values.attributes.beforeUpdate === 0)
+                    values.attributes.beforeUpdate += 1;
+                },
+                afterBulkUpdate: (values)=> {
+                  if (values.attributes.afterUpdate === 0)
+                    values.attributes.afterUpdate += 1;
+                },
                 beforeUpdate: function (values, options) {
                   if (values.dataValues.beforeUpdate === 0)
                     values.beforeUpdate += 1;

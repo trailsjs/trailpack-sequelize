@@ -19,7 +19,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   create(modelName, values, options) {
-    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm.collections[modelName]
+    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
 
     return Model.create(values, options)
   }
@@ -33,7 +33,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   find(modelName, criteria, options) {
-    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm.collections[modelName]
+    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     let query
 
@@ -74,7 +74,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   update(modelName, criteria, values, options) {
-    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm.collections[modelName]
+    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     let query
 
@@ -103,7 +103,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   destroy(modelName, criteria, options) {
-    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm.collections[modelName]
+    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     let query
 
     if (_.isPlainObject(criteria)) {
@@ -126,12 +126,13 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   createAssociation(parentModelName, parentId, childAttributeName, values, options) {
-    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm.collections[parentModelName]
-    const childAttribute = parentModel.attributes[childAttributeName]
-    const childModelName = childAttribute.model || childAttribute.collection
-    const mergedValues = _.extend({[childAttribute.via]: parentId}, values)
+    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    const childAttribute = parentModel.associations[childAttributeName]
+    const childModelName = childAttribute.target.name
 
-    return this.create(childModelName, mergedValues, options)
+    values[childAttribute.foreignKey] = parentId
+
+    return this.create(childModelName, values, options)
   }
 
   /**
@@ -145,32 +146,19 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   findAssociation(parentModelName, parentId, childAttributeName, criteria, options) {
-    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm.collections[parentModelName]
-    const childAttribute = parentModel.attributes[childAttributeName]
-    const childModelName = childAttribute.model || childAttribute.collection
-    const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm.collections[childModelName]
+    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    const childAttribute = parentModel.associations[childAttributeName]
+    const childModelName = childAttribute.target.name
 
-    if (!_.isPlainObject(criteria)) {
-      criteria = {
-        [childModel.primaryKey]: criteria
-      }
-      options = _.defaults({findOne: true}, options)
+    if(!criteria.where){
+      criteria.where = {}
+    }
+    if(!options) {
+      options = {}
     }
 
-    // query within the "many" side of the association
-    if (childAttribute.via) {
-      const mergedCriteria = _.extend({[childAttribute.via]: parentId}, criteria)
-      return this.find(childModelName, mergedCriteria, options)
-    }
-    // query the "one" side of the association
-    const mergedOptions = _.extend({
-      populate: [{
-        attribute: childAttributeName,
-        criteria: criteria
-      }]
-    }, options)
-    return this.find(parentModelName, parentId, mergedOptions)
-      .then(parentRecord => parentRecord[childAttributeName])
+    criteria.where[childAttribute.foreignKey] = parentId
+    return this.find(childModelName, criteria, options)
   }
 
   /**
@@ -184,10 +172,10 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   updateAssociation(parentModelName, parentId, childAttributeName, criteria, values, options) {
-    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm.collections[parentModelName]
-    const childAttribute = parentModel.attributes[childAttributeName]
-    const childModelName = childAttribute.model || childAttribute.collection
-    const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm.collections[childModelName]
+    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    const childAttribute = parentModel.associations[childAttributeName]
+    const childModelName = childAttribute.target.name
+    const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm[childModelName]
 
     if (!_.isPlainObject(criteria)) {
       criteria = {
@@ -220,10 +208,10 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   destroyAssociation(parentModelName, parentId, childAttributeName, criteria, options) {
-    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm.collections[parentModelName]
-    const childAttribute = parentModel.attributes[childAttributeName]
-    const childModelName = childAttribute.model || childAttribute.collection
-    const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm.collections[childModelName]
+    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    const childAttribute = parentModel.associations[childAttributeName]
+    const childModelName = childAttribute.target.name
+    const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm[childModelName]
 
     if (!_.isPlainObject(criteria)) {
       criteria = {

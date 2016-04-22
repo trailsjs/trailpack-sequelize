@@ -92,19 +92,17 @@ describe('api.services.FootprintService', () => {
         .then(role => {
           assert(role)
           assert(role.id)
-          return FootprintService.find('User', userId, {
-            populate: [
-              {
-                attribute: 'roles',
-                criteria: {}
-              }
-            ]
+          return FootprintService.find('User', {
+            where: {
+              id: userId
+            },
+            include: [global.app.orm['User'].associations['roles']]
           })
         })
         .then(user => {
-          assert(user)
-          assert.equal(user.roles.length, 1)
-          assert.equal(user.roles[0].name, 'createassociatedrole')
+          assert(user[0])
+          assert.equal(user[0].roles.length, 1)
+          assert.equal(user[0].roles[0].name, 'createassociatedrole')
         })
 
     })
@@ -124,19 +122,14 @@ describe('api.services.FootprintService', () => {
         .then(role => {
           assert(role)
           assert(role.id)
-          return FootprintService.findAssociation('User', userId, 'roles', {}, {
-            populate: [
-              {
-                attribute: 'user',
-                criteria: {}
-              }
-            ]
+          return FootprintService.findAssociation('User', userId, 'roles', {
+            include: [global.app.orm['User']]
           })
         })
         .then(roles => {
           assert(roles)
           assert(roles[0])
-          assert.equal(roles[0].user.name, 'findassociationtest')
+          assert.equal(roles[0].User.name, 'findassociationtest')
         })
 
     })
