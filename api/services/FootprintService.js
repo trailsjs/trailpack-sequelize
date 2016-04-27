@@ -77,8 +77,14 @@ module.exports = class FootprintService extends Service {
     const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     let query
+    if (!criteria) {
+      criteria = {}
+    }
 
     if (_.isPlainObject(criteria)) {
+      if (!criteria.where) {
+        criteria.where = {}
+      }
       if (modelOptions.defaultLimit) {
         query = Model.update(values, _.defaults(criteria, {
           limit: modelOptions.defaultLimit
@@ -89,7 +95,11 @@ module.exports = class FootprintService extends Service {
       }
     }
     else {
-      query = Model.update(values, criteria).then(results => results[0])
+      query = Model.update(values, {
+        where: {
+          [Model.primaryKey]: criteria
+        }
+      }).then(results => results[0])
     }
 
     return query
@@ -110,14 +120,18 @@ module.exports = class FootprintService extends Service {
       query = Model.destroy(criteria)
     }
     else {
-      query = Model.destroy(criteria).then(results => results[0])
+      query = Model.destroy({
+        where: {
+          [Model.primaryKey]: criteria
+        }
+      }).then(results => results[0])
     }
 
     return query
   }
 
   /**
-   * Create a model, and associate it with its parent model.
+   * TODO Create a model, and associate it with its parent model.
    *
    * @param parentModelName The name of the model's parent
    * @param childAttributeName The name of the model to create
@@ -136,7 +150,7 @@ module.exports = class FootprintService extends Service {
   }
 
   /**
-   * Find all models that satisfy the given criteria, and which is associated
+   * TODO Find all models that satisfy the given criteria, and which is associated
    * with the given Parent Model.
    *
    * @param parentModelName The name of the model's parent
@@ -150,19 +164,19 @@ module.exports = class FootprintService extends Service {
     const childAttribute = parentModel.associations[childAttributeName]
     const childModelName = childAttribute.target.name
 
-    if(!criteria.where){
+    if (!criteria.where && _.isPlainObject(criteria)) {
       criteria.where = {}
     }
-    if(!options) {
+    if (!options) {
       options = {}
     }
-
+    //TODO check every associations
     criteria.where[childAttribute.foreignKey] = parentId
     return this.find(childModelName, criteria, options)
   }
 
   /**
-   * Update models by criteria, and which is associated with the given
+   * TODO Update models by criteria, and which is associated with the given
    * Parent Model.
    *
    * @param parentModelName The name of the model's parent
@@ -177,28 +191,24 @@ module.exports = class FootprintService extends Service {
     const childModelName = childAttribute.target.name
     const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm[childModelName]
 
+    if (!criteria.where && _.isPlainObject(criteria)) {
+      criteria.where = {}
+    }
+    //TODO check every associations
     if (!_.isPlainObject(criteria)) {
       criteria = {
-        [childModel.primaryKey]: criteria
+        where: {
+          [childModel.primaryKeyAttribute]: criteria
+        }
       }
       options = _.defaults({findOne: true}, options)
     }
 
-    if (childAttribute.via) {
-      const mergedCriteria = _.extend({[childAttribute.via]: parentId}, criteria)
-      return this.update(childModelName, mergedCriteria, values, options)
-    }
-
-    const childValues = {[childAttributeName]: values}
-    return this.update(parentModelName, parentId, childValues, options)
-      .then(parentRecord => {
-        const childId = parentRecord[childAttributeName]
-        return this.find(childModelName, childId)
-      })
+    return this.update(childModelName, criteria, values, options)
   }
 
   /**
-   * Destroy models by criteria, and which is associated with the
+   * TODO Destroy models by criteria, and which is associated with the
    * given Parent Model.
    *
    * @param parentModelName The name of the model's parent
@@ -218,7 +228,7 @@ module.exports = class FootprintService extends Service {
         [childModel.primaryKey]: criteria
       }
     }
-
+    //TODO check every associations
     // query within the "many" side of the association
     if (childAttribute.via) {
       const mergedCriteria = _.extend({[childAttribute.via]: parentId}, criteria)

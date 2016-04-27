@@ -33,11 +33,11 @@
     "smokesignals": "^1.0.3",
     "sqlite3": "^3.1.3",
     "trailpack-core": "^1.0.0-beta-6",
-    "trails": "^1.0.0-beta-7",
+    "trails": "^1.0.0-beta-8",
     "trails-model": "^1.0.0-beta-2"
   },
   "scripts": {
-    "test": "eslint --fix . && mocha"
+    "test": "eslint . && mocha"
   },
   "engines": {
     "node": ">= 4.0.0"

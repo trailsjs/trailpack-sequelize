@@ -1,3 +1,5 @@
+./test/index.js
+./test/**/*.test.js
 --reporter spec
 --recursive
 --full-trace

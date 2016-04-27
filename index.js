@@ -61,12 +61,8 @@ module.exports = class SequelizeTrailpack extends Trailpack {
     return Promise.all(
       _.map(this.connections, connection => {
         return new Promise((resolve, reject) => {
-          connection.close((err) => {
-            if (err)
-              return reject(err)
-
-            resolve()
-          })
+          connection.close()
+          resolve()
         })
       })
     )
