@@ -1,7 +1,7 @@
 # trailpack-sequelize
 :package: Sequelize.js Trailpack http://sequelizejs.com
 
-WORK IN PROGRESS, STATUS : create, update, find, destroy are working, associations need to be done 
+WARNING : createAssociation, updateAssociation, findAssociation, destroyAssociation are not working, PR are welcome :) 
 
 [![Gitter][gitter-image]][gitter-url]
 [![NPM version][npm-image]][npm-url]
@@ -84,10 +84,11 @@ module.exports = class UserService extends Service {
    */
   findUser (email) {
     //More info about queries here : http://docs.sequelizejs.com/en/latest/docs/models-usage/
-    return this.orm.User.find({ where: {email: email} })
+    return this.app.orm.User.find({ where: {email: email} })
   }
 }
 ```
+For more informations about sequelize queries, please look at [the official documentation](http://docs.sequelizejs.com/en/latest/docs/querying/)
 
 ## Contributing
 We love contributions! Please check out our [Contributor's Guide](https://github.com/trailsjs/trails/blob/master/CONTRIBUTING.md) for more

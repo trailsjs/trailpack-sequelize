@@ -14,6 +14,14 @@ describe('api.services.FootprintService', () => {
           assert.equal(role.name, 'createtest')
         })
     })
+    it('should insert a record with child', () => {
+      return FootprintService.create('User', {name: 'userTest', roles: [{name: 'roleTest'}]}, {populate: 'roles'})
+        .then(user => {
+          assert.equal(user.name, 'userTest')
+          assert.equal(user.roles.length, 1)
+          assert.equal(user.roles[0].name, 'roleTest')
+        })
+    })
   })
   describe('#find', () => {
     it('should find a single record', () => {
@@ -33,7 +41,7 @@ describe('api.services.FootprintService', () => {
         .then(role => {
           assert.equal(role.name, 'findtest')
           assert(role.id)
-          return FootprintService.find('Role', {where: {name: 'findtest'}})
+          return FootprintService.find('Role', {name: 'findtest'})
         })
         .then(roles => {
           assert(roles[0])
@@ -50,7 +58,7 @@ describe('api.services.FootprintService', () => {
           assert(role.id)
           return FootprintService.update(
             'Role',
-            {where: {name: 'updatetest'}},
+            {name: 'updatetest'},
             {name: 'updated'}
           )
         })
@@ -66,11 +74,11 @@ describe('api.services.FootprintService', () => {
         .then(role => {
           assert.equal(role.name, 'destroytest')
           assert(role.id)
-          return FootprintService.destroy('Role', {where: {name: 'destroytest'}})
+          return FootprintService.destroy('Role', {name: 'destroytest'})
         })
         .then(nbRowDeleted => {
           assert.equal(nbRowDeleted, 1)
-          return FootprintService.find('Role', {where: {name: 'destroytest'}})
+          return FootprintService.find('Role', {name: 'destroytest'})
         })
         .then(roles => {
           assert.equal(roles.length, 0)
@@ -92,12 +100,7 @@ describe('api.services.FootprintService', () => {
         .then(role => {
           assert(role)
           assert(role.id)
-          return FootprintService.find('User', {
-            where: {
-              id: userId
-            },
-            include: [global.app.orm['User'].associations['roles']]
-          })
+          return FootprintService.find('User', userId)
         })
         .then(user => {
           assert(user[0])
@@ -122,9 +125,7 @@ describe('api.services.FootprintService', () => {
         .then(role => {
           assert(role)
           assert(role.id)
-          return FootprintService.findAssociation('User', userId, 'roles', {
-            include: [global.app.orm['User']]
-          })
+          return FootprintService.findAssociation('User', userId, 'roles')
         })
         .then(roles => {
           assert(roles)
