@@ -27,6 +27,8 @@ module.exports = {
 }
 ```
 
+A basic `config/database.js` can be found here : https://github.com/trailsjs/trailpack-sequelize/blob/master/archetype/config/database.js
+
 ### Models
 
 ```js
