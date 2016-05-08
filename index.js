@@ -44,12 +44,13 @@ module.exports = class SequelizeTrailpack extends Trailpack {
       })
     })
 
+    this.app.orm = {}
     _.each(this.models, (model, modelName) => {
       if (this.orm[model.globalId].associate)
         this.orm[model.globalId].associate(this.orm)
-    })
 
-    this.app.orm = this.orm
+      this.app.orm[model.globalId.toLowerCase()] = this.orm[model.globalId]
+    })
 
     return this.migrate()
   }
