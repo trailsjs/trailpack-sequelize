@@ -33,23 +33,23 @@ module.exports = class SequelizeTrailpack extends Trailpack {
     super.initialize()
 
     this.orm = this.orm || {};
+    this.app.orm = {}
     this.connections = lib.Transformer.transformStores(this.app)
     this.models = lib.Transformer.transformModels(this.app)
 
     _.each(this.connections, (connection, name) => {
       _.each(this.models, (model, modelName) => {
         if (model.connection == name) {
-          this.orm[model.globalId] = connection.define(modelName, model.schema, model.config)
+          this.app.orm[model.globalId] = connection.define(modelName, model.schema, model.config)
         }
       })
     })
 
-    this.app.orm = {}
     _.each(this.models, (model, modelName) => {
-      if (this.orm[model.globalId].associate)
-        this.orm[model.globalId].associate(this.orm)
+      if (this.app.orm[model.globalId].associate)
+        this.app.orm[model.globalId].associate(this.app.orm)
 
-      this.app.orm[model.globalId.toLowerCase()] = this.orm[model.globalId]
+      this.orm[model.globalId.toLowerCase()] = this.app.orm[model.globalId]
     })
 
     return this.migrate()
@@ -75,10 +75,10 @@ module.exports = class SequelizeTrailpack extends Trailpack {
     return Promise.all(
       _.map(this.models, model => {
         if (model.migrate == 'drop') {
-          return SchemaMigrationService.dropModel(this.orm[model.globalId])
+          return SchemaMigrationService.dropModel(this.app.orm[model.globalId])
         }
         else if (model.migrate == 'alter') {
-          return SchemaMigrationService.alterModel(this.orm[model.globalId])
+          return SchemaMigrationService.alterModel(this.app.orm[model.globalId])
         }
       })
     )
