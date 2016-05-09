@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-- '4'
-- '5'
-- stable
+- 4
+- 5
+- 6
 
 notifications:
   email: false
@@ -16,8 +16,8 @@ deploy:
   provider: npm
   email: hello@trailsjs.io
   api_key:
-    secure: TODO
+    secure: N3E7sCb40WuloGMZOZARUv5edBQ//DwsKYyhzlGJcYeeeQoWMP5XCkGNCI4GLCRsHU0zD4fbbcf0Wx7BK02usBqJFY2rd8K8YVsrgrudpeotrDptjTHthCMiLiilVVfjihAMslhqMy658d4sJaQF5vr37FTMl4pa38+lc6WYQgraaEq6wMMpoxoWmNMC7loKgHHNOJjfc/gcDueNDPlXow2Ig8lOdwa2cvToH3qVsKxyezxjD7Q/0ATBTfrRKYhz9LhP+cvyIIkdm0CxQFDtl4qTFiOsmlJ0O2OQYgMNQaum4vUjJ0JeZLmsVupuQmGfepMsdCvnuq96ZWpXJICym3s9lhwJsW9a1XJ8KgMIMfVWqlRRlrJpx5fP3RUz/zPMUnU5OB5TpXnafSvmM/8j1Qc67gchvAMwbp+dw4aIMPqdB8xG+LsJBsk5Vq+/XvU/OOMOMuybm49Q77rfc5sq8eJIy0t9/rJwOH7Ha3kQyjSiJlzyLRuW4aU9/Pe67hXoxOysRcnryq0g8EohLUGoc2ddqLvJ83J7cOfVbq5aYO/xqSp7pMjb3e+lGU2z0o6WjrkOl8pv5dciHPHCKvwQOO1wBotOKDwf8WMf8VqcoG1FuKs5Cho2ltAi838NVS6vzZSqWNEEY0Iads5yPA2rl95LIJSoHz+nEwTIVULaFTw=
   on:
     tags: true
     repo: trailsjs/trailpack-sequelize
-    node: stable
+    node: 6
