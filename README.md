@@ -34,7 +34,7 @@ A basic `config/database.js` can be found here : https://github.com/trailsjs/tra
 ```js
 module.exports = class User extends Model {
   //More about supported schema here : http://docs.sequelizejs.com/en/latest/docs/models-definition/
-  static schema () {
+  static schema (Sequelize) {
     return {
        name: { type: Sequelize.STRING, allowNull: false },
        password: Sequelize.STRING,

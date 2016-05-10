@@ -1,7 +1,6 @@
 'use strict'
 
 const _ = require('lodash')
-const Sequelize = require('sequelize')
 const smokesignals = require('smokesignals')
 const Model = require('trails-model')
 
@@ -30,7 +29,7 @@ module.exports = _.defaultsDeep({
           }
         }
 
-        static schema() {
+        static schema(Sequelize) {
           return {
             name: Sequelize.STRING,
             password: Sequelize.STRING,
@@ -57,7 +56,7 @@ module.exports = _.defaultsDeep({
           }
         }
 
-        static schema() {
+        static schema(Sequelize) {
           return {
             name: Sequelize.STRING/*,
              user: {
@@ -115,7 +114,7 @@ module.exports = _.defaultsDeep({
           }
         }
 
-        static schema() {
+        static schema(Sequelize) {
           return {
             name: Sequelize.STRING,
             beforeCreate: Sequelize.INTEGER,
@@ -141,23 +140,15 @@ module.exports = _.defaultsDeep({
       stores: {
         teststore: {
           host: 'localhost',
-          dialect: 'mysql',
-          database: 'test',
-          pool: {
-            max: 5,
-            min: 0,
-            idle: 10000
-          }
+          dialect: 'sqlite',
+          storage: './test/test.sqlite',
+          database: 'test'
         },
         storeoverride: {
           host: 'localhost',
-          dialect: 'mysql',
-          database: 'test',
-          pool: {
-            max: 5,
-            min: 0,
-            idle: 10000
-          }
+          dialect: 'sqlite',
+          storage: './test/test.sqlite',
+          database: 'test'
         }
       },
       models: {

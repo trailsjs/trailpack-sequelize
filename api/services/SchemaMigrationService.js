@@ -17,6 +17,8 @@ module.exports = class SchemaMigrationService extends Service {
       return model.sync({force: true})
     }).then(() => {
       return model.sequelize.query('SET FOREIGN_KEY_CHECKS = 1')
+    }).catch(err => {
+      return model.sync({force: true})
     })
   }
 
@@ -37,6 +39,8 @@ module.exports = class SchemaMigrationService extends Service {
       return connection.sync({force: true})
     }).then(() => {
       return connection.query('SET FOREIGN_KEY_CHECKS = 1')
+    }).catch(err => {
+      return connection.sync({force: true})
     })
   }
 

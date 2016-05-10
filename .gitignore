@@ -26,6 +26,7 @@ build/Release
 
 # Dependency directory
 /.tmp
+/test/*.sqlite
 node_modules
 
 # Optional npm cache directory

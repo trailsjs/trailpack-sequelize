@@ -30,7 +30,7 @@ describe('lib.Transformer', () => {
       const connections = lib.Transformer.transformStores(global.app)
 
       assert(connections.teststore)
-      assert.equal(connections.storeoverride.options.dialect, 'mysql')
+      assert.equal(connections.storeoverride.options.dialect, 'sqlite')
     })
   })
 
