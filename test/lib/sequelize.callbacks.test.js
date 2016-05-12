@@ -12,10 +12,10 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
     it('should create a record with beforeCreate attribute set', () => {
       //FootprintService.destroy('ModelCallbacks',{})
       return FootprintService.create('ModelCallbacks', {
-          name: 'trails_beforeCreate',
-          beforeCreate: 0,
-          beforeValidate: 0
-        })
+        name: 'trails_beforeCreate',
+        beforeCreate: 0,
+        beforeValidate: 0
+      })
         .then(record => {
           assert.equal(record.beforeCreate, 1)
         })
@@ -33,10 +33,10 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   describe('#beforeUpdate', () => {
     it('beforeUpdate should be called', () => {
       return FootprintService.create('ModelCallbacks', {
-          name: 'trails_beforeUpdate',
-          beforeCreate: 0,
-          beforeValidate: 0
-        })
+        name: 'trails_beforeUpdate',
+        beforeCreate: 0,
+        beforeValidate: 0
+      })
         .then(record => {
           return FootprintService.update(
             'ModelCallbacks',
@@ -45,7 +45,7 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
           )
         })
         .then(records => {
-          assert.equal(records[0], 1);
+          assert.equal(records[0], 1)
           return FootprintService.find('ModelCallbacks', {name: 'trails_UpdatedBefore'})
         })
         .then(records => {
@@ -64,7 +64,7 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
           )
         })
         .then(results => {
-          assert.equal(results[0], 1);
+          assert.equal(results[0], 1)
           return FootprintService.find('ModelCallbacks', {name: 'trails_UpdatedAfter'})
         })
         .then(records => {
@@ -83,10 +83,10 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
   describe('#afterValidate', () => {
     it('should create a record with a afterValidate attribute', () => {
       return FootprintService.create('ModelCallbacks', {
-          name: 'trails_afterCreate',
-          beforeValidate: 0,
-          afterValidate: 0
-        })
+        name: 'trails_afterCreate',
+        beforeValidate: 0,
+        afterValidate: 0
+      })
         .then(record => {
           assert.equal(record.afterValidate, 1)
         })

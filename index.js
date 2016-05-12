@@ -32,7 +32,7 @@ module.exports = class SequelizeTrailpack extends Trailpack {
   initialize() {
     super.initialize()
 
-    this.orm = this.orm || {};
+    this.orm = this.orm || {}
     this.app.orm = {}
     this.connections = lib.Transformer.transformStores(this.app)
     this.models = lib.Transformer.transformModels(this.app)
