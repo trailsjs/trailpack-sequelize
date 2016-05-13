@@ -151,16 +151,16 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   createAssociation(parentModelName, parentId, childAttributeName, values, options) {
-    return Promise.reject('trailpack-sequelize does not have createAssociation support yet. Sorry')
     /*
-     const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
-     const childAttribute = parentModel.associations[childAttributeName]
-     const childModelName = childAttribute.target.name
+    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    const childAttribute = parentModel.associations[childAttributeName]
+    const childModelName = childAttribute.target.name
 
-     values[childAttribute.foreignKey] = parentId
+    values[childAttribute.foreignKey] = parentId
 
-     return this.create(childModelName, values, options)
-     */
+    return this.create(childModelName, values, options)
+    */
+    return Promise.reject('trailpack-sequelize does not have createAssociation support yet. Sorry')
   }
 
   /**
@@ -174,7 +174,6 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   findAssociation(parentModelName, parentId, childAttributeName, criteria, options) {
-    return Promise.reject('trailpack-sequelize does not have findAssociation support yet. Sorry')
     /*
      const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
      const childAttribute = parentModel.associations[childAttributeName]
@@ -190,6 +189,7 @@ module.exports = class FootprintService extends Service {
      criteria.where[childAttribute.foreignKey] = parentId
      return this.find(childModelName, criteria, options)
      */
+    return Promise.reject('trailpack-sequelize does not have findAssociation support yet. Sorry')
   }
 
   /**
@@ -203,7 +203,6 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   updateAssociation(parentModelName, parentId, childAttributeName, criteria, values, options) {
-    return Promise.reject('trailpack-sequelize does not have updateAssociation support yet. Sorry')
     /*
      const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
      const childAttribute = parentModel.associations[childAttributeName]
@@ -225,6 +224,7 @@ module.exports = class FootprintService extends Service {
 
      return this.update(childModelName, criteria, values, options)
      */
+    return Promise.reject('trailpack-sequelize does not have updateAssociation support yet. Sorry')
   }
 
   /**
@@ -238,7 +238,6 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   destroyAssociation(parentModelName, parentId, childAttributeName, criteria, options) {
-    return Promise.reject('trailpack-sequelize does not have destroyAssociation support yet. Sorry')
     /*
      const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
      const childAttribute = parentModel.associations[childAttributeName]
@@ -275,5 +274,6 @@ module.exports = class FootprintService extends Service {
      }
      })
      */
+    return Promise.reject('trailpack-sequelize does not have destroyAssociation support yet. Sorry')
   }
 }
