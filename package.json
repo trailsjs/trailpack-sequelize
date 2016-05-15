@@ -1,6 +1,6 @@
 {
   "name": "trailpack-sequelize",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Sequelize.js Trailpack http://sequelizejs.com",
   "homepage": "https://github.com/jaumard/trailpack-sequelize",
   "author": {
@@ -44,6 +44,5 @@
   "eslintConfig": {
     "extends": "trails"
   },
-  "repository": "https://github.com/jaumard/trailpack-sequelize",
-  "private": true
+  "repository": "https://github.com/jaumard/trailpack-sequelize"
 }
