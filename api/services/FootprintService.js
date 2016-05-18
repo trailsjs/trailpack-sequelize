@@ -24,12 +24,17 @@ module.exports = class FootprintService extends Service {
     const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     if (!Model) {
-      return Promise.reject(new ModelError(404, `${modelName} can't be found`))
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
     if (modelOptions.populate) {
       modelOptions.include = modelOptions.populate === true ? {all: true} : this._createIncludeField(Model, modelOptions.populate)
     }
-    return Model.create(values, modelOptions)
+    return Model.create(values, modelOptions).catch(err => {
+      if(err.name == 'SequelizeValidationError') {
+        return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
+      }
+      return Promise.reject(err)
+    })
   }
 
   _createIncludeField(model, options) {
@@ -57,7 +62,7 @@ module.exports = class FootprintService extends Service {
     const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     let query
     if (!Model) {
-      return Promise.reject(new ModelError(404, `${modelName} can't be found`))
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
     if (modelOptions.populate) {
       modelOptions.include = modelOptions.populate === true ? {all: true} : this._createIncludeField(Model, modelOptions.populate)
@@ -76,14 +81,18 @@ module.exports = class FootprintService extends Service {
           }
         }, modelOptions))
       }
-
     }
     else {
       criteria = {where: criteria}
       query = Model.findAll(_.defaults(criteria, modelOptions))
     }
 
-    return query
+    return query.catch(err => {
+      if(err.name == 'SequelizeValidationError') {
+        return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
+      }
+      return Promise.reject(err)
+    })
   }
 
   /**
@@ -102,7 +111,7 @@ module.exports = class FootprintService extends Service {
     const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     //const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     if (!Model) {
-      return Promise.reject(new ModelError(404, `${modelName} can't be found`))
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
     let query
     if (!criteria) {
@@ -121,7 +130,12 @@ module.exports = class FootprintService extends Service {
       }).then(results => results[0])
     }
 
-    return query
+    return query.catch(err => {
+      if(err.name == 'SequelizeValidationError') {
+        return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
+      }
+      return Promise.reject(err)
+    })
   }
 
   /*
@@ -135,7 +149,7 @@ module.exports = class FootprintService extends Service {
     const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     let query
     if (!Model) {
-      return Promise.reject(new ModelError(404, `${modelName} can't be found`))
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
     if (_.isPlainObject(criteria)) {
       criteria = {where: criteria}
@@ -149,7 +163,12 @@ module.exports = class FootprintService extends Service {
       }).then(results => results[0])
     }
 
-    return query
+    return query.catch(err => {
+      if(err.name == 'SequelizeValidationError') {
+        return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
+      }
+      return Promise.reject(err)
+    })
   }
 
   /**

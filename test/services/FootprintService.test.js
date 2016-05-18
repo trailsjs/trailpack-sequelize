@@ -22,6 +22,25 @@ describe('api.services.FootprintService', () => {
           assert.equal(user.roles[0].name, 'roleTest')
         })
     })
+    it('should return a not found error', () => {
+      return FootprintService.create('UnknowModel', {name: 'userTest'})
+        .catch(err => {
+          assert.equal(err.code, 'E_NOT_FOUND')
+          assert.equal(err.message, 'UnknowModel can\'t be found')
+          assert.equal(err.name, 'Model error')
+        })
+    })
+    it('should return a validation error', () => {
+      return FootprintService.create('User', {roles: [{name: 'roleTest'}]}, {populate: 'roles'})
+        .catch(err => {
+          assert.equal(err.code, 'E_VALIDATION')
+          assert.equal(err.message, 'notNull Violation: name cannot be null')
+          assert.equal(err.errors[0].path, 'name')
+          assert.equal(err.errors[0].message, 'name cannot be null')
+          assert.equal(err.errors[0].type, 'notNull Violation')
+          assert.equal(err.name, 'Model error')
+        })
+    })
   })
   describe('#find', () => {
     it('should find a single record', () => {
@@ -49,6 +68,15 @@ describe('api.services.FootprintService', () => {
           assert.equal(roles[0].name, 'findtest')
         })
     })
+
+    it('should return a not found error', () => {
+      return FootprintService.find('UnknowModel', {name: 'findtest'})
+        .catch(err => {
+          assert.equal(err.code, 'E_NOT_FOUND')
+          assert.equal(err.message, 'UnknowModel can\'t be found')
+          assert.equal(err.name, 'Model error')
+        })
+    })
   })
   describe('#update', () => {
     it('should update a set of records', () => {
@@ -67,6 +95,18 @@ describe('api.services.FootprintService', () => {
           assert.equal(results[0], 1)
         })
     })
+    it('should return a not found error', () => {
+      return FootprintService.update(
+        'UnknowModel',
+        {name: 'updatetest'},
+        {name: 'updated'}
+        )
+        .catch(err => {
+          assert.equal(err.code, 'E_NOT_FOUND')
+          assert.equal(err.message, 'UnknowModel can\'t be found')
+          assert.equal(err.name, 'Model error')
+        })
+    })
   })
   describe('#destroy', () => {
     it('should delete a set of records', () => {
@@ -82,6 +122,15 @@ describe('api.services.FootprintService', () => {
         })
         .then(roles => {
           assert.equal(roles.length, 0)
+        })
+    })
+
+    it('should return a not found error', () => {
+      return FootprintService.destroy('UnknowModel', {name: 'destroy'})
+        .catch(err => {
+          assert.equal(err.code, 'E_NOT_FOUND')
+          assert.equal(err.message, 'UnknowModel can\'t be found')
+          assert.equal(err.name, 'Model error')
         })
     })
   })
