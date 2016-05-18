@@ -2,6 +2,7 @@
 
 const _ = require('lodash')
 const Service = require('trails-service')
+const ModelError = require('../../lib').ModelError
 
 /**
  * Trails Service that maps abstract ORM methods to their respective Waterine
@@ -22,6 +23,9 @@ module.exports = class FootprintService extends Service {
   create(modelName, values, options) {
     const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
+    if (!Model) {
+      return Promise.reject(new ModelError(404, `${modelName} can't be found`))
+    }
     if (modelOptions.populate) {
       modelOptions.include = modelOptions.populate === true ? {all: true} : this._createIncludeField(Model, modelOptions.populate)
     }
@@ -52,7 +56,9 @@ module.exports = class FootprintService extends Service {
     const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     let query
-
+    if (!Model) {
+      return Promise.reject(new ModelError(404, `${modelName} can't be found`))
+    }
     if (modelOptions.populate) {
       modelOptions.include = modelOptions.populate === true ? {all: true} : this._createIncludeField(Model, modelOptions.populate)
     }
@@ -95,6 +101,9 @@ module.exports = class FootprintService extends Service {
   update(modelName, criteria, values, options) {
     const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     //const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
+    if (!Model) {
+      return Promise.reject(new ModelError(404, `${modelName} can't be found`))
+    }
     let query
     if (!criteria) {
       criteria = {}
@@ -125,7 +134,9 @@ module.exports = class FootprintService extends Service {
   destroy(modelName, criteria, options) {
     const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
     let query
-
+    if (!Model) {
+      return Promise.reject(new ModelError(404, `${modelName} can't be found`))
+    }
     if (_.isPlainObject(criteria)) {
       criteria = {where: criteria}
       query = Model.destroy(criteria)
@@ -152,14 +163,14 @@ module.exports = class FootprintService extends Service {
    */
   createAssociation(parentModelName, parentId, childAttributeName, values, options) {
     /*
-    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
-    const childAttribute = parentModel.associations[childAttributeName]
-    const childModelName = childAttribute.target.name
+     const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+     const childAttribute = parentModel.associations[childAttributeName]
+     const childModelName = childAttribute.target.name
 
-    values[childAttribute.foreignKey] = parentId
+     values[childAttribute.foreignKey] = parentId
 
-    return this.create(childModelName, values, options)
-    */
+     return this.create(childModelName, values, options)
+     */
     return Promise.reject('trailpack-sequelize does not have createAssociation support yet. Sorry')
   }
 

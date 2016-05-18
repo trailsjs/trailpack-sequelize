@@ -10,6 +10,10 @@ module.exports = class SequelizeTrailpack extends Trailpack {
    * Validate the database config, and api.model definitions
    */
   validate() {
+    const stores = _.get(this.app.config, 'database.stores')
+    if (stores && Object.keys(stores).length === 0) {
+      this.app.config.log.logger.warn('No store configured at config.database.stores, models will be ignored')
+    }
     return Promise.all([
       lib.Validator.validateDatabaseConfig(this.app.config.database)
     ])
@@ -20,9 +24,7 @@ module.exports = class SequelizeTrailpack extends Trailpack {
    */
   configure() {
     this.app.config.database.orm = 'sequelize'
-
     _.merge(this.app.config, lib.FailsafeConfig)
-
   }
 
   /**
@@ -37,8 +39,8 @@ module.exports = class SequelizeTrailpack extends Trailpack {
     this.connections = lib.Transformer.transformStores(this.app)
     this.models = lib.Transformer.transformModels(this.app)
 
-    _.each(this.connections, (connection, name) => {
-      _.each(this.models, (model, modelName) => {
+    _.each(this.models, (model, modelName) => {
+      _.each(this.connections, (connection, name) => {
         if (model.connection == name) {
           this.app.orm[model.globalId] = connection.define(modelName, model.schema, model.config)
         }
@@ -46,6 +48,8 @@ module.exports = class SequelizeTrailpack extends Trailpack {
     })
 
     _.each(this.models, (model, modelName) => {
+      if (!this.app.orm[model.globalId]) return //ignore model if not configured
+
       if (this.app.orm[model.globalId].associate)
         this.app.orm[model.globalId].associate(this.app.orm)
 
@@ -74,6 +78,7 @@ module.exports = class SequelizeTrailpack extends Trailpack {
 
     return Promise.all(
       _.map(this.models, model => {
+        if (!this.app.orm[model.globalId]) return //ignore model if not configured
         if (model.migrate == 'drop') {
           return SchemaMigrationService.dropModel(this.app.orm[model.globalId])
         }
