@@ -30,7 +30,7 @@ module.exports = class FootprintService extends Service {
       modelOptions.include = modelOptions.populate === true ? {all: true} : this._createIncludeField(Model, modelOptions.populate)
     }
     return Model.create(values, modelOptions).catch(err => {
-      if(err.name == 'SequelizeValidationError') {
+      if (err.name == 'SequelizeValidationError') {
         return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
       }
       return Promise.reject(err)
@@ -88,7 +88,7 @@ module.exports = class FootprintService extends Service {
     }
 
     return query.catch(err => {
-      if(err.name == 'SequelizeValidationError') {
+      if (err.name == 'SequelizeValidationError') {
         return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
       }
       return Promise.reject(err)
@@ -131,7 +131,7 @@ module.exports = class FootprintService extends Service {
     }
 
     return query.catch(err => {
-      if(err.name == 'SequelizeValidationError') {
+      if (err.name == 'SequelizeValidationError') {
         return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
       }
       return Promise.reject(err)
@@ -164,7 +164,7 @@ module.exports = class FootprintService extends Service {
     }
 
     return query.catch(err => {
-      if(err.name == 'SequelizeValidationError') {
+      if (err.name == 'SequelizeValidationError') {
         return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
       }
       return Promise.reject(err)
