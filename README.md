@@ -34,7 +34,7 @@ A basic `config/database.js` can be found here : https://github.com/trailsjs/tra
 ```js
 module.exports = class User extends Model {
   //More about supported schema here : http://docs.sequelizejs.com/en/latest/docs/models-definition/
-  static schema (Sequelize) {
+  static schema (app, Sequelize) {
     return {
        name: { type: Sequelize.STRING, allowNull: false },
        password: Sequelize.STRING,
@@ -42,7 +42,7 @@ module.exports = class User extends Model {
      }
   }
 
-  static config () {
+  static config (app, Sequelize) {
     return {
        migrate: 'drop', //override default models configurations if needed
        store: 'sqlite', //override default models configurations if needed
@@ -99,6 +99,9 @@ information on how our projects are organized and how to get started.
 
 ## License
 [MIT](https://github.com/trailsjs/trailpack-sequelize/blob/master/LICENSE)
+
+## Changelog
+[Changelog](https://github.com/trailsjs/trailpack-sequelize/blob/master/CHANGELOG.md)
 
 
 [npm-image]: https://img.shields.io/npm/v/trailpack-sequelize.svg?style=flat-square

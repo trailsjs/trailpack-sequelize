@@ -29,9 +29,9 @@ module.exports = _.defaultsDeep({
           }
         }
 
-        static schema(Sequelize) {
+        static schema(app, Sequelize) {
           return {
-            name: Sequelize.STRING,
+            name: { type: Sequelize.STRING, allowNull: false},
             password: Sequelize.STRING,
             displayName: Sequelize.STRING
           }
@@ -56,7 +56,7 @@ module.exports = _.defaultsDeep({
           }
         }
 
-        static schema(Sequelize) {
+        static schema(app, Sequelize) {
           return {
             name: Sequelize.STRING/*,
              user: {
@@ -114,7 +114,7 @@ module.exports = _.defaultsDeep({
           }
         }
 
-        static schema(Sequelize) {
+        static schema(app, Sequelize) {
           return {
             name: Sequelize.STRING,
             beforeCreate: Sequelize.INTEGER,
