@@ -69,13 +69,12 @@ module.exports = _.defaultsDeep({
         static config() {
           return {
             options: {
-
               hooks: {
                 beforeCreate: (values, options) => {
                   if (values.dataValues.beforeCreate === 0)
                     values.beforeCreate += 1
                 },
-                afterCreate: function (values, options) {
+                afterCreate: (values, options) => {
                   if (values.dataValues.afterCreate === 0)
                     values.afterCreate += 1
                 },
@@ -87,26 +86,26 @@ module.exports = _.defaultsDeep({
                   if (values.attributes.afterUpdate === 0)
                     values.attributes.afterUpdate += 1
                 },
-                beforeUpdate: function (values, options) {
+                beforeUpdate: (values, options) => {
                   if (values.dataValues.beforeUpdate === 0)
                     values.beforeUpdate += 1
                 },
-                afterUpdate: function (values, options) {
+                afterUpdate: (values, options) => {
                   if (values.dataValues.afterUpdate === 0)
                     values.afterUpdate += 1
                 },
-                beforeValidate: function (values, options) {
+                beforeValidate: (values, options) => {
                   if (values.dataValues.beforeValidate === 0)
                     values.beforeValidate += 1
                 },
-                afterValidate: function (values, options) {
+                afterValidate: (values, options) => {
                   if (values.dataValues.afterValidate === 0)
                     values.afterValidate += 1
                 },
-                beforeDestroy: function (values, options) {
+                beforeDestroy: (values, options) => {
 
                 },
-                afterDestroy: function (values, options) {
+                afterDestroy: (values, options) => {
 
                 }
               }
