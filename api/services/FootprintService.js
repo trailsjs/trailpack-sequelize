@@ -104,12 +104,11 @@ module.exports = class FootprintService extends Service {
    * @param criteria The criteria that determine which models are to be updated   *
    * @param [id] A optional model id; overrides "criteria" if both are specified.
    * @param values to update
-   * @param options no used yet for sequelize
+   * @param options extends { where: criteria } then passed to sequelize
    * @return Promise
    */
   update(modelName, criteria, values, options) {
     const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
-    //const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     if (!Model) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
@@ -120,14 +119,15 @@ module.exports = class FootprintService extends Service {
 
     if (_.isPlainObject(criteria)) {
       criteria = {where: criteria}
-      query = Model.update(values, criteria)
+      query = Model.update(values, _.extend(criteria, options))
     }
     else {
-      query = Model.update(values, {
+      criteria = {
         where: {
           [Model.primaryKeyAttribute]: criteria
         }
-      }).then(results => results[0])
+      }
+      query = Model.update(values, _.extend(criteria, options)).then(results => results[0])
     }
 
     return query.catch(err => {
@@ -172,7 +172,7 @@ module.exports = class FootprintService extends Service {
   }
 
   /**
-   * TODO Create a model, and associate it with its parent model.
+   * Create a model, and associate it with its parent model.
    *
    * @param parentModelName The name of the model's parent
    * @param childAttributeName The name of the model to create
@@ -181,20 +181,41 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   createAssociation(parentModelName, parentId, childAttributeName, values, options) {
-    /*
-     const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
-     const childAttribute = parentModel.associations[childAttributeName]
-     const childModelName = childAttribute.target.name
+    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    if (!parentModel) {
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
+    }
+    const association = parentModel.associations[childAttributeName]
+    if (!association) {
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
+    }
+    const childModelName = association.target.name
 
-     values[childAttribute.foreignKey] = parentId
-
-     return this.create(childModelName, values, options)
-     */
-    return Promise.reject('trailpack-sequelize does not have createAssociation support yet. Sorry')
+    if (!options) {
+      options = {}
+    }
+    // Used for things like hasMany
+    if (association.foreignKeyField || (association.sourceKey && !association.targetKey)) {
+      values[association.foreignKeyField || association.foreignKey] = parentId
+    }
+    return parentModel.sequelize.transaction(t => {
+      options.transaction = t
+      return this.create(childModelName, values, options).then(child => {
+        // Used for things like belongsTo
+        if (!association.foreignKeyField) {
+          return this.update(parentModelName, parentId, {
+            [association.identifierField]: child.id
+          }, options).then(() => child)
+        }
+        else {
+          return child
+        }
+      })
+    })
   }
 
   /**
-   * TODO Find all models that satisfy the given criteria, and which is associated
+   * Find all models that satisfy the given criteria, and which is associated
    * with the given Parent Model.
    *
    * @param parentModelName The name of the model's parent
@@ -204,26 +225,70 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   findAssociation(parentModelName, parentId, childAttributeName, criteria, options) {
-    /*
-     const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
-     const childAttribute = parentModel.associations[childAttributeName]
-     const childModelName = childAttribute.target.name
+    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    if (!parentModel) {
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
+    }
+    const association = parentModel.associations[childAttributeName]
+    if (!association) {
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
+    }
+    const childModelName = association.target.name
+    const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm[childModelName]
+    if (!childModel) {
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${childModelName} can't be found`))
+    }
 
-     if (!criteria.where && _.isPlainObject(criteria)) {
-     criteria.where = {}
-     }
-     if (!options) {
-     options = {}
-     }
-     //TODO check every associations
-     criteria.where[childAttribute.foreignKey] = parentId
-     return this.find(childModelName, criteria, options)
-     */
-    return Promise.reject('trailpack-sequelize does not have findAssociation support yet. Sorry')
+    // Used for things like hasMany
+    if (association.foreignKeyField || (association.sourceKey && !association.targetKey)) {
+      if (!criteria) {
+        criteria = {}
+      }
+      else if (!_.isPlainObject(criteria)) {
+        criteria = {
+          [childModel.primaryKeyAttribute]: criteria
+        }
+      }
+      criteria[association.foreignKeyField || association.foreignKey] = parentId
+      if (!options) {
+        options = {}
+      }
+      return this.find(childModelName, criteria, options)
+    }
+    // Used for things like belongsToMany
+    else if (association.throughModel) {
+      // Get all through tables with the parent
+      return association.throughModel.findAll({
+        where: {
+          [association.identifierField]: parentId
+        },
+        attributes: [association.foreignIdentifierField]
+      })
+        // Get the childrens' IDs
+        .then(throughTables => throughTables.map(throughTable => throughTable[association.foreignIdentifierField]))
+        .then(ids => childModel.findAll(_.extend({
+          where: _.extend({
+            [childModel.primaryKeyAttribute]: {
+              $in: ids
+            }
+          }, criteria)
+        }, options)))
+        .catch(err => {
+          if (err.name == 'SequelizeValidationError') {
+            return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
+          }
+          return Promise.reject(err)
+        })
+    }
+    // Used for things like belongsTo
+    else {
+      return this.find(parentModelName, parentId)
+        .then(parent => this.find(childModelName, parent[association.identifierField], options))
+    }
   }
 
   /**
-   * TODO Update models by criteria, and which is associated with the given
+   * Update models by criteria, and which is associated with the given
    * Parent Model.
    *
    * @param parentModelName The name of the model's parent
@@ -233,32 +298,71 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   updateAssociation(parentModelName, parentId, childAttributeName, criteria, values, options) {
-    /*
-     const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
-     const childAttribute = parentModel.associations[childAttributeName]
-     const childModelName = childAttribute.target.name
-     const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm[childModelName]
+    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    if (!parentModel) {
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
+    }
+    const association = parentModel.associations[childAttributeName]
+    if (!association) {
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
+    }
+    const childModelName = association.target.name
+    const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm[childModelName]
+    if (!childModel) {
+      return Promise.reject(new ModelError('E_NOT_FOUND', `${childModelName} can't be found`))
+    }
 
-     if (!criteria.where && _.isPlainObject(criteria)) {
-     criteria.where = {}
-     }
-     //TODO check every associations
-     if (!_.isPlainObject(criteria)) {
-     criteria = {
-     where: {
-     [childModel.primaryKeyAttribute]: criteria
-     }
-     }
-     options = _.defaults({findOne: true}, options)
-     }
-
-     return this.update(childModelName, criteria, values, options)
-     */
-    return Promise.reject('trailpack-sequelize does not have updateAssociation support yet. Sorry')
+    // Used for things like hasMany
+    if (association.foreignKeyField || (association.sourceKey && !association.targetKey)) {
+      if (!options) {
+        options = {}
+      }
+      if (!criteria) {
+        criteria = {}
+      }
+      else if (!_.isPlainObject(criteria)) {
+        criteria = {
+          [childModel.primaryKeyAttribute]: criteria
+        }
+        options.findOne = true
+      }
+      criteria[association.foreignKeyField || association.foreignKey] = parentId
+      return this.update(childModelName, criteria, values, options)
+    }
+    // Used for things like belongsToMany
+    else if (association.throughModel) {
+      // Get all through tables with the parent
+      return association.throughModel.findAll({
+        where: {
+          [association.identifierField]: parentId
+        },
+        attributes: [association.foreignIdentifierField]
+      })
+        // Get the childrens' IDs
+        .then(throughTables => throughTables.map(throughTable => throughTable[association.foreignIdentifierField]))
+        .then(ids => childModel.update(values, _.extend({
+          where: _.extend({
+            [childModel.primaryKeyAttribute]: {
+              $in: ids
+            }
+          }, criteria)
+        }, options)))
+        .catch(err => {
+          if (err.name == 'SequelizeValidationError') {
+            return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
+          }
+          return Promise.reject(err)
+        })
+    }
+    // Used for things like belongsTo
+    else {
+      return this.find(parentModelName, parentId)
+        .then(parent => this.update(childModelName, parent[association.identifierField], values, options))
+    }
   }
 
   /**
-   * TODO Destroy models by criteria, and which is associated with the
+   * Destroy models by criteria, and which is associated with the
    * given Parent Model.
    *
    * @param parentModelName The name of the model's parent
@@ -268,42 +372,22 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   destroyAssociation(parentModelName, parentId, childAttributeName, criteria, options) {
-    /*
-     const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
-     const childAttribute = parentModel.associations[childAttributeName]
-     const childModelName = childAttribute.target.name
-     const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm[childModelName]
-
-     if (!_.isPlainObject(criteria)) {
-     criteria = {
-     [childModel.primaryKey]: criteria
-     }
-     }
-     //TODO check every associations
-     // query within the "many" side of the association
-     if (childAttribute.via) {
-     const mergedCriteria = _.extend({[childAttribute.via]: parentId}, criteria)
-     return this.destroy(childModelName, mergedCriteria, options)
-     .then(records => {
-     return _.map(records, record => {
-     return {
-     [childModel.primaryKey]: record[childModel.primaryKey]
-     }
-     })
-     })
-     }
-     // query the "one" side of the association
-     return this
-     .findAssociation(parentModelName, parentId, childAttributeName, criteria, options)
-     .then(record => {
-     return this.destroy(childModelName, record[childModel.primaryKey])
-     })
-     .then(destroyedRecord => {
-     return {
-     [childModel.primaryKey]: destroyedRecord[childModel.primaryKey]
-     }
-     })
-     */
-    return Promise.reject('trailpack-sequelize does not have destroyAssociation support yet. Sorry')
+    return this
+      .findAssociation(parentModelName, parentId, childAttributeName, criteria, options)
+      .then(records => {
+        // If criteria is the ID for instance
+        if (!(records instanceof Array)) {
+          records = [records]
+        }
+        return Promise.all(records.map(record => {
+          return record.destroy()
+        }))
+      })
+      .catch(err => {
+        if (err.name == 'SequelizeValidationError') {
+          return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
+        }
+        return Promise.reject(err)
+      })
   }
 }
