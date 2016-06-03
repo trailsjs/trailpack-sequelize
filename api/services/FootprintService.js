@@ -44,13 +44,15 @@ module.exports = class FootprintService extends Service {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
     if (modelOptions.populate) {
-      modelOptions.include = modelOptions.populate === true ? {all: true} : this._createIncludeField(Model, modelOptions.populate)
+      modelOptions.include = this._createIncludeField(Model, modelOptions.populate)
     }
     return Model.create(values, modelOptions).catch(manageError)
   }
 
-  _createIncludeField(model, options) {
-    const fields = options.split(',')
+  _createIncludeField(model, populate) {
+    if (populate === true) return {all: true}
+
+    const fields = populate.split(',')
     const includes = []
 
     fields.forEach((value, key) => {
@@ -77,7 +79,7 @@ module.exports = class FootprintService extends Service {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
     if (modelOptions.populate) {
-      modelOptions.include = modelOptions.populate === true ? {all: true} : this._createIncludeField(Model, modelOptions.populate)
+      modelOptions.include = this._createIncludeField(Model, modelOptions.populate)
     }
     delete modelOptions.populate
 
@@ -231,7 +233,7 @@ module.exports = class FootprintService extends Service {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
     }
     const childModelName = association.target.name
-    const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm[childModelName]
+    const childModel = this._getModel(childModelName)
     if (!childModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${childModelName} can't be found`))
     }
@@ -255,14 +257,7 @@ module.exports = class FootprintService extends Service {
     // Used for things like belongsToMany
     else if (association.throughModel) {
       // Get all through tables with the parent
-      return association.throughModel.findAll({
-        where: {
-          [association.identifierField]: parentId
-        },
-        attributes: [association.foreignIdentifierField]
-      })
-        // Get the childrens' IDs
-        .then(throughTables => throughTables.map(throughTable => throughTable[association.foreignIdentifierField]))
+      return this._getThroughModelAssociation(association, parentId)
         .then(ids => childModel.findAll(_.extend({
           where: _.extend({
             [childModel.primaryKeyAttribute]: {
@@ -299,7 +294,7 @@ module.exports = class FootprintService extends Service {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
     }
     const childModelName = association.target.name
-    const childModel = this.app.orm[childModelName] || this.app.packs.sequelize.orm[childModelName]
+    const childModel = this._getModel(childModelName)
     if (!childModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${childModelName} can't be found`))
     }
@@ -324,14 +319,7 @@ module.exports = class FootprintService extends Service {
     // Used for things like belongsToMany
     else if (association.throughModel) {
       // Get all through tables with the parent
-      return association.throughModel.findAll({
-        where: {
-          [association.identifierField]: parentId
-        },
-        attributes: [association.foreignIdentifierField]
-      })
-        // Get the childrens' IDs
-        .then(throughTables => throughTables.map(throughTable => throughTable[association.foreignIdentifierField]))
+      return this._getThroughModelAssociation(association, parentId)
         .then(ids => childModel.update(values, _.extend({
           where: _.extend({
             [childModel.primaryKeyAttribute]: {
@@ -346,6 +334,17 @@ module.exports = class FootprintService extends Service {
       return this.find(parentModelName, parentId)
         .then(parent => this.update(childModelName, parent[association.identifierField], values, options))
     }
+  }
+
+  _getThroughModelAssociation(association, parentId) {
+    return association.throughModel.findAll({
+      where: {
+        [association.identifierField]: parentId
+      },
+      attributes: [association.foreignIdentifierField]
+    })
+      // Get the childrens' IDs
+      .then(throughTables => throughTables.map(throughTable => throughTable[association.foreignIdentifierField]))
   }
 
   /**
