@@ -10,6 +10,51 @@ module.exports = _.defaultsDeep({
   },
   api: {
     models: {
+      Page: class Page extends Model {
+        static config() {
+          return {
+            options: {
+              classMethods: {
+                associate: (models) => {
+                  models.Page.belongsTo(models.User, { as: 'Owner' })
+                }
+              }
+            }
+          }
+        }
+
+        static schema(app, Sequelize) {
+          return {
+            name: { type: Sequelize.STRING, allowNull: false}
+          }
+        }
+      },
+      Project: class Project extends Model {
+        static config() {
+          return {
+            options: {
+              classMethods: {
+                associate: (models) => {
+                  models.Project.belongsToMany(models.User, { through: models.UserProject })
+                  models.Project.hasOne(models.Page)
+                }
+              }
+            }
+          }
+        }
+        static schema(app, Sequelize) {
+          return {
+            name: Sequelize.STRING
+          }
+        }
+      },
+      UserProject: class UserProject extends Model {
+        static schema(app, Sequelize) {
+          return {
+            status: Sequelize.STRING
+          }
+        }
+      },
       User: class User extends Model {
         static config() {
           return {

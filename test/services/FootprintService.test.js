@@ -135,9 +135,27 @@ describe('api.services.FootprintService', () => {
     })
   })
   describe('#createAssociation', () => {
-    it.skip('TODO should insert an associated record', () => {
+    it('should work for hasOne', () => {
+      let projectId
+      return FootprintService.create('Project', {name: 'createassociationhasonetest'})
+        .then(project => {
+          assert(project)
+          assert(project.id)
+          projectId = project.id
+          return FootprintService.createAssociation('Project', project.id, 'Page', {
+            name: 'createassociatedpage'
+          })
+        })
+        .then(page => {
+          assert(page)
+          assert(page.id)
+          assert.equal(page.dataValues.ProjectId, projectId)
+        })
+    })
+
+    it('should work for hasMany', () => {
       let userId
-      return FootprintService.create('User', {name: 'createassociationtest'})
+      return FootprintService.create('User', {name: 'createassociationhasmanytest'})
         .then(user => {
           assert(user)
           assert(user.id)
@@ -149,18 +167,52 @@ describe('api.services.FootprintService', () => {
         .then(role => {
           assert(role)
           assert(role.id)
-          return FootprintService.find('User', userId)
+          assert.equal(role.dataValues.UserId, userId)
         })
-        .then(user => {
-          assert(user[0])
-          assert.equal(user[0].roles.length, 1)
-          assert.equal(user[0].roles[0].name, 'createassociatedrole')
-        })
+    })
 
+    it('should work for belongsTo', () => {
+      return FootprintService.create('Page', {name: 'createassociationbelongstotest'})
+        .then(page => {
+          assert(page)
+          assert(page.id)
+          return FootprintService.createAssociation('Page', page.id, 'Owner', {
+            name: 'createassociateduser'
+          })
+          .then(user => {
+            return FootprintService.find('Page', page.id)
+              .then(page => assert.equal(page.dataValues.OwnerId, user.id))
+          })
+        })
     })
   })
   describe('#findAssociation', () => {
-    it.skip('TODO should find an associated record', () => {
+    it('should work for hasOne', () => {
+      let projectId
+      return FootprintService.create('Project', {name: 'createassociationhasonetest'})
+        .then(project => {
+          assert(project)
+          assert(project.id)
+          projectId = project.id
+          return FootprintService.createAssociation('Project', project.id, 'Page', {
+            name: 'createassociatedpage'
+          })
+        })
+        .then(page => {
+          assert(page)
+          assert(page.id)
+          assert.equal(page.dataValues.ProjectId, projectId)
+          return FootprintService.findAssociation('Project', projectId, 'Page')
+        })
+        .then(pages => {
+          let page = pages[0]
+          assert(page)
+          assert(page.id)
+          assert.equal(page.dataValues.ProjectId, projectId)
+        })
+    })
+
+    it('should work for hasMany', () => {
       let userId
       return FootprintService.create('User', {name: 'findassociationtest'})
         .then(user => {
@@ -177,17 +229,79 @@ describe('api.services.FootprintService', () => {
           return FootprintService.findAssociation('User', userId, 'roles')
         })
         .then(roles => {
-          assert(roles)
-          assert(roles[0])
-          assert.equal(roles[0].User.name, 'findassociationtest')
+          let role = roles[0]
+          assert(role)
+          assert(role.id)
+          assert.equal(role.dataValues.UserId, userId)
         })
+    })
 
+    it('should work for belongsTo', () => {
+      let pageId
+      return FootprintService.create('Page', {name: 'findassociationbelongstotest'})
+        .then(page => {
+          assert(page)
+          assert(page.id)
+          pageId = page.id
+          return FootprintService.createAssociation('Page', page.id, 'Owner', {
+            name: 'findassociatedowner'
+          })
+        })
+        .then(owner => {
+          assert(owner)
+          assert(owner.id)
+          return FootprintService.findAssociation('Page', pageId, 'Owner')
+            .then(user => assert.equal(user.id, owner.id))
+        })
+    })
+
+    it('should work for belongsToMany', () => {
+      let projectId, userId
+      return FootprintService.create('Project', {name: 'findassociationbelongstotest'})
+        .then(project => {
+          assert(project.id)
+          projectId = project.id
+          return FootprintService.create('User', {name: 'findassociateduser'})
+        })
+        .then(user => {
+          assert(user.id)
+          userId = user.id
+          return FootprintService.create('UserProject', {UserId: user.id, ProjectId: projectId})
+        })
+        .then(userproject => {
+          return FootprintService.findAssociation('Project', projectId, 'Users')
+            .then(users => assert.equal(users[0].id, userId))
+        })
     })
   })
   describe('#updateAssociation', () => {
-    it.skip('TODO should update an associated record', () => {
+    it('should work for hasOne', () => {
+      let projectId
+      return FootprintService.create('Project', {name: 'updateassociationhasonetest'})
+        .then(project => {
+          assert(project)
+          assert(project.id)
+          projectId = project.id
+          return FootprintService.createAssociation('Project', projectId, 'Page', {
+            name: 'findassociatedpage'
+          })
+        })
+        .then(page => {
+          assert(page)
+          assert(page.id)
+          return FootprintService.updateAssociation('Project', projectId, 'Page', {}, {name: 'updateassociatedpage'})
+        })
+        .then(() => {
+          return FootprintService.findAssociation('Project', projectId, 'Page')
+        }).then(roles => {
+          let role = roles[0]
+          assert.equal(role.dataValues.name, 'updateassociatedpage')
+        })
+    })
+
+    it('should work for hasMany', () => {
       let userId
-      return FootprintService.create('User', {name: 'updateassociationtest'})
+      return FootprintService.create('User', {name: 'updateassociationhasmanytest'})
         .then(user => {
           assert(user)
           assert(user.id)
@@ -199,24 +313,63 @@ describe('api.services.FootprintService', () => {
         .then(role => {
           assert(role)
           assert(role.id)
-          return FootprintService.updateAssociation(
-            'User',
-            userId,
-            'roles',
-            {user: userId},
-            {name: 'updateassociatedrole'}
-          )
+          return FootprintService.updateAssociation('User', userId, 'roles', {}, {name: 'updateassociatedrole'})
         })
-        .then(roles => {
-          assert(roles[0])
-          return FootprintService.find('Role', roles[0])
-        }).then(role => {
-          assert.equal(role.name, 'updateassociatedrole')
+        .then(() => {
+          return FootprintService.findAssociation('User', userId, 'roles')
+        }).then(roles => {
+          let role = roles[0]
+          assert.equal(role.dataValues.name, 'updateassociatedrole')
+        })
+    })
+
+    it('should work for belongsTo', () => {
+      let pageId
+      return FootprintService.create('Page', {name: 'updateassociationbelongstotest'})
+        .then(page => {
+          assert(page.id)
+          pageId = page.id
+          return FootprintService.createAssociation('Page', page.id, 'Owner', {
+            name: 'updateassociatedowner'
+          })
+        })
+        .then(user => {
+          assert(user.id)
+          return FootprintService.updateAssociation('Page', pageId, 'Owner', {}, {name: 'updatedassociatedowner'})
+        })
+        .then(() => {
+          return FootprintService.findAssociation('Page', pageId, 'Owner')
+        })
+        .then(user => assert.equal(user.dataValues.name, 'updatedassociatedowner'))
+    })
+
+    it('should work for belongsToMany', () => {
+      let projectId, userId
+      return FootprintService.create('Project', {name: 'updatebelongstomanytest'})
+        .then(project => {
+          assert(project.id)
+          projectId = project.id
+          return FootprintService.create('User', {name: 'originalassociateduser'})
+        })
+        .then(user => {
+          assert(user.id)
+          userId = user.id
+          return FootprintService.create('UserProject', {UserId: user.id, ProjectId: projectId})
+        })
+        .then(userproject => {
+          return FootprintService.updateAssociation('Project', projectId, 'Users', {}, {name: 'updatedassociateduser'})
+        })
+        .then(updated => {
+          return FootprintService.findAssociation('Project', projectId, 'Users')
+        })
+        .then(users => {
+          assert.equal(users.length, 1)
+          assert.equal(users[0].dataValues.name, 'updatedassociateduser')
         })
     })
   })
   describe('#destroyAssociation', () => {
-    it.skip('TODO should delete an associated record', () => {
+    it('should delete an associated record', () => {
       let userId
       return FootprintService.create('User', {name: 'destroyassociationtest'})
         .then(user => {
@@ -234,7 +387,7 @@ describe('api.services.FootprintService', () => {
         })
         .then(roles => {
           assert(roles)
-          return FootprintService.find('User', userId, {populate: [{attribute: 'roles'}]})
+          return FootprintService.find('User', userId, {populate: 'roles'})
         })
         .then(user => {
           assert.equal(user.roles.length, 0)
