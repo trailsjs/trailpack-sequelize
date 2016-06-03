@@ -1,8 +1,6 @@
 # trailpack-sequelize
 :package: Sequelize.js Trailpack http://sequelizejs.com
 
-WARNING : createAssociation, updateAssociation, findAssociation, destroyAssociation for Footprints are not working, PR are welcome :) 
-
 [![Gitter][gitter-image]][gitter-url]
 [![NPM version][npm-image]][npm-url]
 [![Build status][ci-image]][ci-url]
