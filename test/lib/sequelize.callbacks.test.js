@@ -54,7 +54,7 @@ describe('lib.Transformer.SequelizeCallbacks', () => {
     })
   })
   describe('#afterUpdate', () => {
-    it.skip('beforeUpdate should be called', () => {
+    it.skip('afterUpdate should be called', () => {
       return FootprintService.create('ModelCallbacks', {name: 'trails_afterUpdate', beforeValidate: 0})
         .then(record => {
           return FootprintService.update(

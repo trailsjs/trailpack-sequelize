@@ -75,15 +75,18 @@ module.exports = class SequelizeTrailpack extends Trailpack {
 
   migrate() {
     const SchemaMigrationService = this.app.services.SchemaMigrationService
+    const database = this.app.config.database
+
+    if (database.models.migrate == 'none') return
 
     return Promise.all(
-      _.map(this.models, model => {
-        if (!this.app.orm[model.globalId]) return //ignore model if not configured
-        if (model.migrate == 'drop') {
-          return SchemaMigrationService.dropModel(this.app.orm[model.globalId])
+      _.map(this.connections, connection => {
+
+        if (database.models.migrate == 'drop') {
+          return SchemaMigrationService.dropDB(connection)
         }
-        else if (model.migrate == 'alter') {
-          return SchemaMigrationService.alterModel(this.app.orm[model.globalId])
+        else if (database.models.migrate == 'alter') {
+          return SchemaMigrationService.alterDB(connection)
         }
       })
     )
