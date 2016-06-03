@@ -205,7 +205,7 @@ describe('api.services.FootprintService', () => {
           return FootprintService.findAssociation('Project', projectId, 'Page')
         })
         .then(pages => {
-          let page = pages[0]
+          const page = pages[0]
           assert(page)
           assert(page.id)
           assert.equal(page.dataValues.ProjectId, projectId)
@@ -229,7 +229,7 @@ describe('api.services.FootprintService', () => {
           return FootprintService.findAssociation('User', userId, 'roles')
         })
         .then(roles => {
-          let role = roles[0]
+          const role = roles[0]
           assert(role)
           assert(role.id)
           assert.equal(role.dataValues.UserId, userId)
@@ -294,7 +294,7 @@ describe('api.services.FootprintService', () => {
         .then(() => {
           return FootprintService.findAssociation('Project', projectId, 'Page')
         }).then(roles => {
-          let role = roles[0]
+          const role = roles[0]
           assert.equal(role.dataValues.name, 'updateassociatedpage')
         })
     })
@@ -318,7 +318,7 @@ describe('api.services.FootprintService', () => {
         .then(() => {
           return FootprintService.findAssociation('User', userId, 'roles')
         }).then(roles => {
-          let role = roles[0]
+          const role = roles[0]
           assert.equal(role.dataValues.name, 'updateassociatedrole')
         })
     })

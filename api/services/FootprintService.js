@@ -4,12 +4,29 @@ const _ = require('lodash')
 const Service = require('trails-service')
 const ModelError = require('../../lib').ModelError
 
+const manageError = err => {
+  if (err.name === 'SequelizeValidationError') {
+    return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
+  }
+  return Promise.reject(err)
+}
+
 /**
  * Trails Service that maps abstract ORM methods to their respective Waterine
  * methods. This service can be thought of as an "adapter" between trails and
  * Sequelize. All methods return native ES6 Promises.
  */
 module.exports = class FootprintService extends Service {
+
+  /**
+   * Internal method to retreive model object
+   * @param modelName name of the model to retreive
+   * @returns {*} sequelize model object
+   * @private
+   */
+  _getModel(modelName) {
+    return this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
+  }
 
   /**
    * Create a model, or models. Multiple models will be created if "values" is
@@ -21,7 +38,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   create(modelName, values, options) {
-    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
+    const Model = this._getModel(modelName)
     const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     if (!Model) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
@@ -29,12 +46,7 @@ module.exports = class FootprintService extends Service {
     if (modelOptions.populate) {
       modelOptions.include = modelOptions.populate === true ? {all: true} : this._createIncludeField(Model, modelOptions.populate)
     }
-    return Model.create(values, modelOptions).catch(err => {
-      if (err.name == 'SequelizeValidationError') {
-        return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
-      }
-      return Promise.reject(err)
-    })
+    return Model.create(values, modelOptions).catch(manageError)
   }
 
   _createIncludeField(model, options) {
@@ -58,7 +70,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   find(modelName, criteria, options) {
-    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
+    const Model = this._getModel(modelName)
     const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
     let query
     if (!Model) {
@@ -87,12 +99,7 @@ module.exports = class FootprintService extends Service {
       query = Model.findAll(_.defaults(criteria, modelOptions))
     }
 
-    return query.catch(err => {
-      if (err.name == 'SequelizeValidationError') {
-        return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
-      }
-      return Promise.reject(err)
-    })
+    return query.catch(manageError)
   }
 
   /**
@@ -108,7 +115,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   update(modelName, criteria, values, options) {
-    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
+    const Model = this._getModel(modelName)
     if (!Model) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
@@ -130,15 +137,10 @@ module.exports = class FootprintService extends Service {
       query = Model.update(values, _.extend(criteria, options)).then(results => results[0])
     }
 
-    return query.catch(err => {
-      if (err.name == 'SequelizeValidationError') {
-        return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
-      }
-      return Promise.reject(err)
-    })
+    return query.catch(manageError)
   }
 
-  /*
+  /**
    * Destroy (delete) the model, or models, that match the given criteria.
    *
    * @param modelName The name of the model
@@ -146,7 +148,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   destroy(modelName, criteria, options) {
-    const Model = this.app.orm[modelName] || this.app.packs.sequelize.orm[modelName]
+    const Model = this._getModel(modelName)
     let query
     if (!Model) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
@@ -163,12 +165,7 @@ module.exports = class FootprintService extends Service {
       }).then(results => results[0])
     }
 
-    return query.catch(err => {
-      if (err.name == 'SequelizeValidationError') {
-        return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
-      }
-      return Promise.reject(err)
-    })
+    return query.catch(manageError)
   }
 
   /**
@@ -181,7 +178,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   createAssociation(parentModelName, parentId, childAttributeName, values, options) {
-    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    const parentModel = this._getModel(parentModelName)
     if (!parentModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
     }
@@ -225,7 +222,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   findAssociation(parentModelName, parentId, childAttributeName, criteria, options) {
-    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    const parentModel = this._getModel(parentModelName)
     if (!parentModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
     }
@@ -273,12 +270,7 @@ module.exports = class FootprintService extends Service {
             }
           }, criteria)
         }, options)))
-        .catch(err => {
-          if (err.name == 'SequelizeValidationError') {
-            return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
-          }
-          return Promise.reject(err)
-        })
+        .catch(manageError)
     }
     // Used for things like belongsTo
     else {
@@ -298,7 +290,7 @@ module.exports = class FootprintService extends Service {
    * @return Promise
    */
   updateAssociation(parentModelName, parentId, childAttributeName, criteria, values, options) {
-    const parentModel = this.app.orm[parentModelName] || this.app.packs.sequelize.orm[parentModelName]
+    const parentModel = this._getModel(parentModelName)
     if (!parentModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
     }
@@ -347,12 +339,7 @@ module.exports = class FootprintService extends Service {
             }
           }, criteria)
         }, options)))
-        .catch(err => {
-          if (err.name == 'SequelizeValidationError') {
-            return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
-          }
-          return Promise.reject(err)
-        })
+        .catch(manageError)
     }
     // Used for things like belongsTo
     else {
@@ -383,11 +370,6 @@ module.exports = class FootprintService extends Service {
           return record.destroy()
         }))
       })
-      .catch(err => {
-        if (err.name == 'SequelizeValidationError') {
-          return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
-        }
-        return Promise.reject(err)
-      })
+      .catch(manageError)
   }
 }
