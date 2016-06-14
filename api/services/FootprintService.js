@@ -39,7 +39,7 @@ module.exports = class FootprintService extends Service {
    */
   create(modelName, values, options) {
     const Model = this._getModel(modelName)
-    const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
+    const modelOptions = _.defaultsDeep({}, options, _.get(this.app.config, 'footprints.models.options'))
     if (!Model) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
@@ -50,7 +50,7 @@ module.exports = class FootprintService extends Service {
   }
 
   _createIncludeField(model, populate) {
-    if (populate === true) return {all: true}
+    if (populate === true || populate === 'all') return {all: true}
 
     const fields = populate.split(',')
     const includes = []
@@ -73,7 +73,7 @@ module.exports = class FootprintService extends Service {
    */
   find(modelName, criteria, options) {
     const Model = this._getModel(modelName)
-    const modelOptions = _.defaultsDeep({}, options, _.get(this.config, 'footprints.models.options'))
+    const modelOptions = _.defaultsDeep({}, options, _.get(this.app.config, 'footprints.models.options'))
     let query
     if (!Model) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
