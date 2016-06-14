@@ -90,6 +90,15 @@ module.exports = class UserService extends Service {
 ```
 For more informations about sequelize queries, please look at [the official documentation](http://docs.sequelizejs.com/en/latest/docs/querying/)
 
+## Footprints query options
+Some options can be provide as query param for the `find` method, example `GET /api/v1/user`.
+
+### Populate 
+You can add `/api/v1/user?populate=all` to populate all associations or use `/api/v1/user?populate=field1,field2` to populate only some association.
+
+### Pagination
+By settings `offset` and `limit` you can do some pagination, example `/api/v1/user?offset=10&limit=10` will return only 10 items started from 10 (id 10 to 20). 
+
 ## Contributing
 We love contributions! Please check out our [Contributor's Guide](https://github.com/trailsjs/trails/blob/master/CONTRIBUTING.md) for more
 information on how our projects are organized and how to get started.
