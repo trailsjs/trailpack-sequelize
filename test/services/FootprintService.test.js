@@ -185,6 +185,35 @@ describe('api.services.FootprintService', () => {
           })
         })
     })
+
+    it('should work for belongsToMany', () => {
+      let projectId, userId
+      return FootprintService.create('project', {name: 'createassociationbelongstomanytest'})
+        .then(project => {
+          assert(project)
+          assert(project.id)
+          projectId = project.id
+          return FootprintService.createAssociation('Project', project.id, 'Users', {
+            name: 'createassociateduser'
+          })
+        })
+        .then(user => {
+          assert(user)
+          assert(user.id)
+          userId = user.id
+          return FootprintService.find('UserProject', {
+            UserId: userId,
+            ProjectId: projectId
+          })
+        })
+        .then(userProjects => {
+          assert.equal(userProjects.length, 1)
+          const userProject = userProjects[0]
+          assert(userProject)
+          assert.equal(userProject.UserId, userId)
+          assert.equal(userProject.ProjectId, projectId)
+        })
+    })
   })
   describe('#findAssociation', () => {
     it('should work for hasOne', () => {
