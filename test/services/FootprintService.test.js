@@ -273,6 +273,23 @@ describe('api.services.FootprintService', () => {
             .then(users => assert.equal(users[0].id, userId))
         })
     })
+
+    it('should join criteria with an and clause for belongsToMany', () => {
+      let projectId
+      return FootprintService.create('Project', {name: 'findassociationbelongstotest'})
+        .then(project => {
+          assert(project.id)
+          projectId = project.id
+          return FootprintService.create('User', {name: 'findunassociateduser'})
+        })
+        .then(user=> {
+          return FootprintService.findAssociation('Project', projectId, 'Users', {
+            id: user.id
+          })
+            .then(users => assert(!users.length))
+        })
+    })
+
   })
   describe('#updateAssociation', () => {
     it('should work for hasOne', () => {

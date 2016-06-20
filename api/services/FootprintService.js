@@ -259,11 +259,16 @@ module.exports = class FootprintService extends Service {
       // Get all through tables with the parent
       return this._getThroughModelAssociation(association, parentId)
         .then(ids => childModel.findAll(_.extend({
-          where: _.extend({
-            [childModel.primaryKeyAttribute]: {
-              $in: ids
-            }
-          }, criteria)
+          where: {
+            $and: [
+              criteria || {},
+              {
+                [childModel.primaryKeyAttribute]: {
+                  $in: ids
+                }
+              }
+            ]
+          }
         }, options)))
         .catch(manageError)
     }
@@ -321,11 +326,16 @@ module.exports = class FootprintService extends Service {
       // Get all through tables with the parent
       return this._getThroughModelAssociation(association, parentId)
         .then(ids => childModel.update(values, _.extend({
-          where: _.extend({
-            [childModel.primaryKeyAttribute]: {
-              $in: ids
-            }
-          }, criteria)
+          where: {
+            $and: [
+              criteria || {},
+              {
+                [childModel.primaryKeyAttribute]: {
+                  $in: ids
+                }
+              }
+            ]
+          }
         }, options)))
         .catch(manageError)
     }
