@@ -189,6 +189,7 @@ module.exports = class FootprintService extends Service {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
     }
     const childModelName = association.target.name
+    const childModel = this._getModel(childModelName)
 
     if (!options) {
       options = {}
@@ -200,15 +201,22 @@ module.exports = class FootprintService extends Service {
     return parentModel.sequelize.transaction(t => {
       options.transaction = t
       return this.create(childModelName, values, options).then(child => {
+        let promise = Promise.resolve()
+        // Used for things like belongsToMany
+        if (association.throughModel) {
+          promise = promise.then(association.throughModel.create({
+            [association.identifierField]: parentId,
+            [association.foreignIdentifierField]: child[childModel.primaryKeyAttribute]
+          }, options))
+        }
         // Used for things like belongsTo
         if (!association.foreignKeyField) {
-          return this.update(parentModelName, parentId, {
-            [association.identifierField]: child.id
-          }, options).then(() => child)
+          promise = promise.then(this.update(parentModelName, parentId, {
+            [association.identifierField]: child[childModel.primaryKeyAttribute]
+          }, options).then(() => child))
         }
-        else {
-          return child
-        }
+        promise = promise.then(() => child)
+        return promise
       })
     })
   }
