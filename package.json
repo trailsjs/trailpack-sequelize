@@ -1,6 +1,6 @@
 {
   "name": "trailpack-sequelize",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Sequelize.js Trailpack http://sequelizejs.com",
   "homepage": "https://github.com/jaumard/trailpack-sequelize",
   "author": {
@@ -21,8 +21,8 @@
   "dependencies": {
     "joi": "^8.4.2",
     "lodash": "^4.13.1",
-    "sequelize": "^3.23.3",
-    "trailpack-datastore": "^1.0.1",
+    "sequelize": "^3.23.4",
+    "trailpack-datastore": "^1.0.2",
     "trails-service": "^1.0.0-beta-2"
   },
   "devDependencies": {
