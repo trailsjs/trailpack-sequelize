@@ -51,6 +51,7 @@ module.exports = class FootprintService extends Service {
 
   _createIncludeField(model, populate) {
     if (populate === true || populate === 'all') return {all: true}
+    if (_.isPlainObject(populate) || _.isArray(populate)) return populate
 
     const fields = populate.split(',')
     const includes = []
@@ -85,7 +86,10 @@ module.exports = class FootprintService extends Service {
 
     if (!_.isPlainObject(criteria) || modelOptions.findOne === true) {
       if (modelOptions.findOne === true) {
-        criteria = {where: criteria}
+        if (!criteria.where) {
+          criteria = {where: criteria}
+        }
+
         query = Model.find(_.defaults(criteria, modelOptions))
       }
       else {
@@ -97,7 +101,9 @@ module.exports = class FootprintService extends Service {
       }
     }
     else {
-      criteria = {where: criteria}
+      if (!criteria.where) {
+        criteria = {where: criteria}
+      }
       query = Model.findAll(_.defaults(criteria, modelOptions))
     }
 
@@ -118,6 +124,7 @@ module.exports = class FootprintService extends Service {
    */
   update(modelName, criteria, values, options) {
     const Model = this._getModel(modelName)
+    if (!options) options = {}
     if (!Model) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
@@ -126,8 +133,15 @@ module.exports = class FootprintService extends Service {
       criteria = {}
     }
 
+    if (_.isArray(options.populate) || _.isPlainObject(options.populate)) {
+      options.include = options.populate
+      delete options.populate
+    }
+
     if (_.isPlainObject(criteria)) {
-      criteria = {where: criteria}
+      if (!criteria.where) {
+        criteria = {where: criteria}
+      }
       query = Model.update(values, _.extend(criteria, options))
     }
     else {
@@ -136,6 +150,7 @@ module.exports = class FootprintService extends Service {
           [Model.primaryKeyAttribute]: criteria
         }
       }
+
       query = Model.update(values, _.extend(criteria, options)).then(results => results[0])
     }
 
@@ -147,24 +162,39 @@ module.exports = class FootprintService extends Service {
    *
    * @param modelName The name of the model
    * @param criteria The criteria that determine which models are to be updated
+   * @param options to pass to sequelize
    * @return Promise
    */
   destroy(modelName, criteria, options) {
     const Model = this._getModel(modelName)
+    if (!options) options = {}
     let query
     if (!Model) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
+
+    if (_.isArray(options.populate) || _.isPlainObject(options.populate)) {
+      options.include = options.populate
+      delete options.populate
+    }
+
     if (_.isPlainObject(criteria)) {
-      criteria = {where: criteria}
-      query = Model.destroy(criteria)
+      if (!criteria.where) {
+        criteria = {where: criteria}
+      }
+      if (_.isArray(options.populate) || _.isPlainObject(options.populate)) {
+        criteria.include = options.populate
+        delete options.populate
+      }
+      query = Model.destroy(_.extend(criteria, options))
     }
     else {
-      query = Model.destroy({
+      criteria = {
         where: {
           [Model.primaryKeyAttribute]: criteria
         }
-      }).then(results => results[0])
+      }
+      query = Model.destroy(_.extend(criteria, options)).then(results => results[0])
     }
 
     return query.catch(manageError)
@@ -177,6 +207,7 @@ module.exports = class FootprintService extends Service {
    * @param childAttributeName The name of the model to create
    * @param parentId The id (required) of the parent model
    * @param values The model's values
+   * @param options to pass to sequelize
    * @return Promise
    */
   createAssociation(parentModelName, parentId, childAttributeName, values, options) {
@@ -229,6 +260,7 @@ module.exports = class FootprintService extends Service {
    * @param childAttributeName The name of the model to create
    * @param parentId The id (required) of the parent model
    * @param criteria The search criteria
+   * @param options to pass to sequelize
    * @return Promise
    */
   findAssociation(parentModelName, parentId, childAttributeName, criteria, options) {
@@ -295,6 +327,8 @@ module.exports = class FootprintService extends Service {
    * @param parentId The id (required) of the parent model
    * @param childAttributeName The name of the model to create
    * @param criteria The search criteria
+   * @param values to update
+   * @param options to pass to sequelize
    * @return Promise
    */
   updateAssociation(parentModelName, parentId, childAttributeName, criteria, values, options) {
@@ -373,6 +407,7 @@ module.exports = class FootprintService extends Service {
    * @param parentId The id (required) of the parent model
    * @param childAttributeName The name of the model to create
    * @param criteria The search criteria
+   * @param options to pass to sequelize
    * @return Promise
    */
   destroyAssociation(parentModelName, parentId, childAttributeName, criteria, options) {
