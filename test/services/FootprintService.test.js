@@ -390,7 +390,7 @@ describe('api.services.FootprintService', () => {
     })
 
     it('should work for belongsToMany', () => {
-      let projectId, userId
+      let projectId
       return FootprintService.create('Project', {name: 'updatebelongstomanytest'})
         .then(project => {
           assert(project.id)
@@ -399,7 +399,6 @@ describe('api.services.FootprintService', () => {
         })
         .then(user => {
           assert(user.id)
-          userId = user.id
           return FootprintService.create('UserProject', {UserId: user.id, ProjectId: projectId})
         })
         .then(userproject => {
