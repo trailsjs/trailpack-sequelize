@@ -1,6 +1,6 @@
 {
   "name": "trailpack-sequelize",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Sequelize.js Trailpack http://sequelizejs.com",
   "homepage": "https://github.com/jaumard/trailpack-sequelize",
   "author": {
@@ -21,14 +21,14 @@
   "dependencies": {
     "joi": "^8.4.2",
     "lodash": "^4.13.1",
-    "sequelize": "^3.23.4",
+    "sequelize": "^3.23.6",
     "trailpack-datastore": "^1.0.2",
     "trails-service": "^1.0.0-beta-2"
   },
   "devDependencies": {
-    "eslint": "^2.12.0",
+    "eslint": "^2.13.1",
     "eslint-config-trails": "^1.0.7",
-    "mocha": "^2.5.1",
+    "mocha": "^2.5.3",
     "smokesignals": "^1.2.2",
     "sqlite3": "^3.1.4",
     "trailpack-core": "^1.0.0",
