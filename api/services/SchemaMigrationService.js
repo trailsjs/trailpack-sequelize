@@ -35,10 +35,11 @@ module.exports = class SchemaMigrationService extends Service {
    * @param connection connection object
    */
   dropDB(connection) {
-    return connection.query(dialect==='sqlite'?'PRAGMA foreign_keys = OFF':'SET FOREIGN_KEY_CHECKS = 0').then(() => {
+    const dialect = connection.dialect.connectionManager.dialectName
+    return connection.query(dialect === 'sqlite' ? 'PRAGMA foreign_keys = OFF' : 'SET FOREIGN_KEY_CHECKS = 0').then(() => {
       return connection.sync({force: true})
     }).then(() => {
-      return connection.query(dialect==='sqlite'?'PRAGMA foreign_keys = ON':'SET FOREIGN_KEY_CHECKS = 1')
+      return connection.query(dialect === 'sqlite' ? 'PRAGMA foreign_keys = ON' : 'SET FOREIGN_KEY_CHECKS = 1')
     }).catch(err => {
       return connection.sync({force: true})
     })
