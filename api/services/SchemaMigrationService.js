@@ -13,10 +13,11 @@ module.exports = class SchemaMigrationService extends Service {
    * @param model model object
    */
   dropModel(model) {
-    return model.sequelize.query('SET FOREIGN_KEY_CHECKS = 0').then(() => {
+    const dialect = connection.dialect.connectionManager.dialectName
+    return model.sequelize.query(dialect === 'sqlite' ? 'PRAGMA foreign_keys = OFF' : 'SET FOREIGN_KEY_CHECKS = 0').then(() => {
       return model.sync({force: true})
     }).then(() => {
-      return model.sequelize.query('SET FOREIGN_KEY_CHECKS = 1')
+      return model.sequelize.query(dialect === 'sqlite' ? 'PRAGMA foreign_keys = ON' : 'SET FOREIGN_KEY_CHECKS = 1')
     }).catch(err => {
       return model.sync({force: true})
     })
