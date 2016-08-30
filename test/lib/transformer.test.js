@@ -32,6 +32,18 @@ describe('lib.Transformer', () => {
       assert(connections.teststore)
       assert.equal(connections.storeoverride.options.dialect, 'sqlite')
     })
+    it('should transform uri properly', () => {
+      const connections = lib.Transformer.transformStores(global.app)
+      assert(connections.uristore)
+      assert.equal(connections.uristore.options.dialect, 'sqlite')
+      assert.equal(connections.uristore.options.host, 'testhost')
+      assert.equal(connections.uristore.config.host, 'testhost')
+      assert.equal(connections.uristore.config.database, 'testdb')
+      // test config for other dialects
+      assert.equal(connections.uristore.config.port, 1234)
+      assert.equal(connections.uristore.config.username, 'testuser')
+      assert.equal(connections.uristore.config.password, 'password')
+    })
   })
 
 })

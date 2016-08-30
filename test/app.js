@@ -193,6 +193,9 @@ module.exports = _.defaultsDeep({
           dialect: 'sqlite',
           storage: './test/test.sqlite',
           database: 'test'
+        },
+        uristore: {
+          uri: 'sqlite://testuser:password@testhost:1234/testdb'
         }
       },
       models: {
