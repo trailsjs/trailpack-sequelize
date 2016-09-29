@@ -19,20 +19,20 @@
     "database"
   ],
   "dependencies": {
-    "joi": "^8.4.2",
-    "lodash": "^4.13.1",
-    "sequelize": "^3.23.6",
+    "joi": "^9.0.4",
+    "lodash": "^4.16.2",
+    "sequelize": "^3.24.3",
     "trailpack-datastore": "^1.0.2",
     "trails-service": "^1.0.0-beta-2"
   },
   "devDependencies": {
-    "eslint": "^2.13.1",
+    "eslint": "^3.6.1",
     "eslint-config-trails": "^1.0.7",
-    "mocha": "^2.5.3",
+    "mocha": "^3.1.0",
     "smokesignals": "^1.2.2",
     "sqlite3": "^3.1.4",
-    "trailpack-core": "^1.0.0",
-    "trails": "^1.0.4",
+    "trailpack-core": "^1.0.1",
+    "trails": "^1.1.0",
     "trails-model": "^1.0.0-beta-2"
   },
   "scripts": {
