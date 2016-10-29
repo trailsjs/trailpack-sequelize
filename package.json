@@ -18,25 +18,30 @@
     "datastore",
     "database"
   ],
+  "pre-commit": [
+    "test"
+  ],
   "dependencies": {
-    "joi": "^9.0.4",
-    "lodash": "^4.16.2",
-    "sequelize": "^3.24.3",
+    "joi": "^9.2.0",
+    "lodash": "^4.16.4",
+    "sequelize": "^3.24.6",
+    "snyk": "^1.19.1",
     "trailpack-datastore": "^1.0.2",
     "trails-service": "^1.0.0-beta-2"
   },
   "devDependencies": {
-    "eslint": "^3.6.1",
-    "eslint-config-trails": "^1.0.7",
-    "mocha": "^3.1.0",
+    "eslint": "^3.9.0",
+    "eslint-config-trails": "^1.0.8",
+    "mocha": "^3.1.2",
+    "pre-commit": "^1.1.3",
     "smokesignals": "^1.2.2",
-    "sqlite3": "^3.1.4",
+    "sqlite3": "^3.1.8",
     "trailpack-core": "^1.0.1",
     "trails": "^1.1.0",
     "trails-model": "^1.0.0-beta-2"
   },
   "scripts": {
-    "test": "eslint . && mocha"
+    "test": "snyk test && eslint . && mocha"
   },
   "engines": {
     "node": ">= 4.0.0"
