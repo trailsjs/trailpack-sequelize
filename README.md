@@ -2,6 +2,7 @@
 :package: Sequelize.js Trailpack http://sequelizejs.com
 
 [![Gitter][gitter-image]][gitter-url]
+[![Known Vulnerabilities][snyk-image]][snyk-url]
 [![NPM version][npm-image]][npm-url]
 [![Build status][ci-image]][ci-url]
 [![Dependency Status][daviddm-image]][daviddm-url]
@@ -110,7 +111,8 @@ information on how our projects are organized and how to get started.
 ## Changelog
 [Changelog](https://github.com/trailsjs/trailpack-sequelize/blob/master/CHANGELOG.md)
 
-
+[snyk-image]: https://snyk.io/test/github/trailsjs/trailpack-sequelize/badge.svg
+[snyk-url]: https://snyk.io/test/github/trailsjs/trailpack-sequelize
 [npm-image]: https://img.shields.io/npm/v/trailpack-sequelize.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/trailpack-sequelize
 [ci-image]: https://img.shields.io/travis/trailsjs/trailpack-sequelize/master.svg?style=flat-square
