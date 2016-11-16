@@ -24,7 +24,7 @@
   "dependencies": {
     "joi": "^9.2.0",
     "lodash": "^4.16.4",
-    "sequelize": "^3.24.6",
+    "sequelize": "^4.0.0",
     "snyk": "^1.19.1",
     "trailpack-datastore": "^1.0.2",
     "trails-service": "^1.0.0-beta-2"
