@@ -175,8 +175,6 @@ module.exports = _.defaultsDeep({
   config: {
     main: {
       packs: [
-        smokesignals.Trailpack,
-        require('trailpack-core'),
         require('../') // trailpack-sequelize
       ]
     },
