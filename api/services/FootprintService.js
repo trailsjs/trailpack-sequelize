@@ -151,7 +151,7 @@ module.exports = class FootprintService extends Service {
         }
       }
 
-      query = Model.update(values, _.extend(criteria, options)).then(results => results[0])
+      query = Model.update(values, _.extend(criteria, options))
     }
 
     return query.catch(manageError)
