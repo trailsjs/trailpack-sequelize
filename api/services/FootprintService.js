@@ -133,6 +133,10 @@ module.exports = class FootprintService extends Service {
       criteria = {}
     }
 
+    if(!_.has(options.returning)) {
+      options.returning = true
+    }
+
     if (_.isArray(options.populate) || _.isPlainObject(options.populate)) {
       options.include = options.populate
       delete options.populate
