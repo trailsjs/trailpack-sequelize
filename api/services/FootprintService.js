@@ -133,7 +133,7 @@ module.exports = class FootprintService extends Service {
       criteria = {}
     }
 
-    if(!_.has(options.returning)) {
+    if (!_.has(options.returning)) {
       options.returning = true
     }
 
