@@ -104,6 +104,10 @@ module.exports = class FootprintService extends Service {
       if (!criteria.where) {
         criteria = {where: criteria}
       }
+      if (modelOptions.sort) {
+        criteria.order = modelOptions.sort
+        delete modelOptions.sort
+      }
       query = Model.findAll(_.defaults(criteria, modelOptions))
     }
 
