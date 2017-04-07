@@ -40,7 +40,7 @@
     "trails-model": "^2.0.1"
   },
   "scripts": {
-    "test": "snyk test && eslint . && mocha"
+    "test": "eslint . && mocha"
   },
   "engines": {
     "node": ">= 4.0.0"
