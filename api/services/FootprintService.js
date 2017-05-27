@@ -5,7 +5,7 @@ const Service = require('trails-service')
 const ModelError = require('../../lib').ModelError
 
 const manageError = err => {
-  if (err.name === 'SequelizeValidationError') {
+  if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
     return Promise.reject(new ModelError('E_VALIDATION', err.message, err.errors))
   }
   return Promise.reject(err)
