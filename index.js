@@ -1,6 +1,6 @@
 'use strict'
 
-const Trailpack = require('trailpack-datastore')
+const Trailpack = require('trailpack/datastore')
 const lib = require('./lib')
 const _ = require('lodash')
 

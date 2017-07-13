@@ -100,7 +100,7 @@ describe('api.services.FootprintService', () => {
         'UnknowModel',
         {name: 'updatetest'},
         {name: 'updated'}
-        )
+      )
         .catch(err => {
           assert.equal(err.code, 'E_NOT_FOUND')
           assert.equal(err.message, 'UnknowModel can\'t be found')
@@ -179,10 +179,10 @@ describe('api.services.FootprintService', () => {
           return FootprintService.createAssociation('Page', page.id, 'Owner', {
             name: 'createassociateduser'
           })
-          .then(user => {
-            return FootprintService.find('Page', page.id)
-              .then(page => assert.equal(page.dataValues.OwnerId, user.id))
-          })
+            .then(user => {
+              return FootprintService.find('Page', page.id)
+                .then(page => assert.equal(page.dataValues.OwnerId, user.id))
+            })
         })
     })
 
