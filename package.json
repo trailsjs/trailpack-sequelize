@@ -8,6 +8,13 @@
     "email": "jimmy.aumard@gmail.com",
     "url": "https://github.com/jaumard"
   },
+  "contributors": [
+    {
+      "name": "Scott Wyatt",
+      "email": "scottwyatt86@gmail.com",
+      "url": "https://github.com/scott-wyatt"
+    }
+  ],
   "main": "index.js",
   "keywords": [
     "trailpack",
@@ -19,23 +26,23 @@
     "database"
   ],
   "pre-commit": [
-    "test"
+
   ],
   "dependencies": {
     "joi": "^10.6.0",
     "lodash": "^4.17.4",
     "sequelize": "^4.3.1",
     "snyk": "^1.36.2",
-    "trailpack": "^2.1.2"
+    "trailpack": "^3"
   },
   "devDependencies": {
     "eslint": "^4.2.0",
     "eslint-config-trails": "^3.0.0",
     "mocha": "^3.4.2",
     "pre-commit": "^1.2.2",
-    "smokesignals": "^2.1.1",
+    "smokesignals": "^3",
     "sqlite3": "^3.1.8",
-    "trails": "^2.0.2"
+    "trails": "^3"
   },
   "scripts": {
     "test": "eslint --fix . && mocha"
