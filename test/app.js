@@ -2,7 +2,7 @@
 
 const _ = require('lodash')
 const smokesignals = require('smokesignals')
-const Model = require('trails/lib/model')
+const Model = require('trails/lib/Model')
 
 module.exports = _.defaultsDeep({
   pkg: {
@@ -13,6 +13,7 @@ module.exports = _.defaultsDeep({
       Page: class Page extends Model {
         static config() {
           return {
+            store: 'teststore',
             options: {
               classMethods: {
                 associate: (models) => {
@@ -32,6 +33,7 @@ module.exports = _.defaultsDeep({
       Project: class Project extends Model {
         static config() {
           return {
+            store: 'teststore',
             options: {
               classMethods: {
                 associate: (models) => {
@@ -49,6 +51,11 @@ module.exports = _.defaultsDeep({
         }
       },
       UserProject: class UserProject extends Model {
+        static config() {
+          return {
+            store: 'teststore'
+          }
+        }
         static schema(app, Sequelize) {
           return {
             status: Sequelize.STRING
@@ -58,6 +65,7 @@ module.exports = _.defaultsDeep({
       User: class User extends Model {
         static config() {
           return {
+            store: 'teststore',
             options: {
               classMethods: {
                 associate: (models) => {
@@ -113,6 +121,7 @@ module.exports = _.defaultsDeep({
       ModelCallbacks: class ModelCallbacks extends Model {
         static config() {
           return {
+            store: 'teststore',
             options: {
               hooks: {
                 beforeCreate: (values, options) => {
@@ -178,27 +187,26 @@ module.exports = _.defaultsDeep({
         require('../') // trailpack-sequelize
       ]
     },
-    database: {
-      stores: {
-        teststore: {
-          host: 'localhost',
-          dialect: 'sqlite',
-          storage: './test/test.sqlite',
-          database: 'test'
-        },
-        storeoverride: {
-          host: 'localhost',
-          dialect: 'sqlite',
-          storage: './test/test.sqlite',
-          database: 'test'
-        },
-        uristore: {
-          uri: 'sqlite://testuser:password@testhost:1234/testdb'
-        }
-      },
-      models: {
-        defaultStore: 'teststore',
+    models: {
+      defaultStore: 'teststore',
+      migrate: 'drop'
+    },
+    stores: {
+      teststore: {
+        host: 'localhost',
+        dialect: 'sqlite',
+        storage: './test/test.sqlite',
+        database: 'test',
         migrate: 'drop'
+      },
+      storeoverride: {
+        host: 'localhost',
+        dialect: 'sqlite',
+        storage: './test/test.sqlite',
+        database: 'test'
+      },
+      uristore: {
+        uri: 'sqlite://testuser:password@testhost:1234/testdb'
       }
     }
   }

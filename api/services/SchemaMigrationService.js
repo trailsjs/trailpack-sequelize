@@ -1,6 +1,6 @@
 'use strict'
 
-const Service = require('trails/lib/service')
+const Service = require('trails/lib/Service')
 
 /**
  * @module SchemaMigrationService
