@@ -26,7 +26,7 @@
     "database"
   ],
   "pre-commit": [
-
+    "test"
   ],
   "dependencies": {
     "joi": "^12.0.0",
