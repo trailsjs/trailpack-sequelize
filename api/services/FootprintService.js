@@ -1,7 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
-const Service = require('trails/service')
+const Service = require('trails/lib/service')
 const ModelError = require('../../lib').ModelError
 
 const manageError = err => {

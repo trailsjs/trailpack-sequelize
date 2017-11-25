@@ -9,7 +9,7 @@ module.exports = class SequelizeTrailpack extends Trailpack {
   /**
    * Validate the database config, and api.model definitions
    */
-  validate() {
+  async validate() {
     const stores = _.get(this.app.config, 'database.stores')
     if (stores && Object.keys(stores).length === 0) {
       this.app.config.log.logger.warn('No store configured at config.database.stores, models will be ignored')
@@ -41,7 +41,7 @@ module.exports = class SequelizeTrailpack extends Trailpack {
 
     _.each(this.models, (model, modelName) => {
       _.each(this.connections, (connection, name) => {
-        if (model.connection == name) {
+        if (model.connection === name) {
           const Model = connection.define(modelName, model.schema, model.config)
 
           if (model.config) {
@@ -78,7 +78,7 @@ module.exports = class SequelizeTrailpack extends Trailpack {
   /**
    * Close all database connections
    */
-  unload() {
+  async unload() {
     return Promise.all(
       _.map(this.connections, connection => {
         return new Promise((resolve, reject) => {
@@ -89,19 +89,19 @@ module.exports = class SequelizeTrailpack extends Trailpack {
     )
   }
 
-  migrate() {
+  async migrate() {
     const SchemaMigrationService = this.app.services.SchemaMigrationService
     const database = this.app.config.database
 
-    if (database.models.migrate == 'none') return
+    if (database.models.migrate === 'none') return
 
     return Promise.all(
       _.map(this.connections, connection => {
 
-        if (database.models.migrate == 'drop') {
+        if (database.models.migrate === 'drop') {
           return SchemaMigrationService.dropDB(connection)
         }
-        else if (database.models.migrate == 'alter') {
+        else if (database.models.migrate === 'alter') {
           return SchemaMigrationService.alterDB(connection)
         }
       })
