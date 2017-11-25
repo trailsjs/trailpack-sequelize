@@ -91,17 +91,17 @@ module.exports = class SequelizeTrailpack extends Trailpack {
 
   async migrate() {
     const SchemaMigrationService = this.app.services.SchemaMigrationService
-    const database = this.app.config.database
+    const migrate = this.app.config.get('database.models.migrate')
 
-    if (database.models.migrate === 'none') return
+    if (migrate === 'none') return
 
     return Promise.all(
       _.map(this.connections, connection => {
 
-        if (database.models.migrate === 'drop') {
+        if (migrate === 'drop') {
           return SchemaMigrationService.dropDB(connection)
         }
-        else if (database.models.migrate === 'alter') {
+        else if (migrate === 'alter') {
           return SchemaMigrationService.alterDB(connection)
         }
       })
