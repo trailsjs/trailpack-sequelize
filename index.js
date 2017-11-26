@@ -11,12 +11,16 @@ module.exports = class SequelizeTrailpack extends Trailpack {
    * Validate the database config, and api.model definitions
    */
   async validate() {
-    const stores = _.get(this.app.config, 'database.stores')
+    const stores = this.app.config.get('stores')
+    const models = this.app.config.get('models')
+
     if (stores && Object.keys(stores).length === 0) {
-      this.app.config.log.logger.warn('No store configured at config.database.stores, models will be ignored')
+      this.app.config.log.logger.warn('No store configured at config.stores, models will be ignored')
     }
+
     return Promise.all([
-      lib.Validator.validateStoresConfig(stores)
+      lib.Validator.validateStoresConfig(stores),
+      lib.Validator.validateModelsConfig(models)
     ])
   }
 

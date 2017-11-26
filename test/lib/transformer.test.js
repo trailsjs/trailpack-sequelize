@@ -22,6 +22,7 @@ describe('lib.Transformer', () => {
 
       assert.equal(models.User.store, 'teststore')
       assert.equal(models.Role.store, 'storeoverride')
+      assert.equal(models.Override.tableName, 'override')
     })
   })
 

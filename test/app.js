@@ -178,7 +178,20 @@ module.exports = _.defaultsDeep({
             afterValidate: Sequelize.INTEGER
           }
         }
-      }
+      },
+      Override: class Override extends Model {
+        static config() {
+          return {
+            store: 'teststore',
+            tableName: 'shouldoverride'
+          }
+        }
+        static schema(app, Sequelize) {
+          return {
+            status: Sequelize.STRING
+          }
+        }
+      },
     }
   },
   config: {
@@ -189,7 +202,10 @@ module.exports = _.defaultsDeep({
     },
     models: {
       defaultStore: 'teststore',
-      migrate: 'drop'
+      migrate: 'drop',
+      Override: {
+        tableName: 'override'
+      }
     },
     stores: {
       teststore: {
