@@ -1,3 +1,4 @@
+/* eslint no-console: [0] */
 'use strict'
 
 const Trailpack = require('trailpack/datastore')
@@ -9,13 +10,17 @@ module.exports = class SequelizeTrailpack extends Trailpack {
   /**
    * Validate the database config, and api.model definitions
    */
-  validate() {
-    const stores = _.get(this.app.config, 'database.stores')
+  async validate() {
+    const stores = this.app.config.get('stores')
+    const models = this.app.config.get('models')
+
     if (stores && Object.keys(stores).length === 0) {
-      this.app.config.log.logger.warn('No store configured at config.database.stores, models will be ignored')
+      this.app.config.log.logger.warn('No store configured at config.stores, models will be ignored')
     }
+
     return Promise.all([
-      lib.Validator.validateDatabaseConfig(this.app.config.database)
+      lib.Validator.validateStoresConfig(stores),
+      lib.Validator.validateModelsConfig(models)
     ])
   }
 
@@ -23,7 +28,7 @@ module.exports = class SequelizeTrailpack extends Trailpack {
    * Merge configuration into models, load Sequelize collections.
    */
   configure() {
-    this.app.config.database.orm = 'sequelize'
+    this.app.config.set('stores.orm', 'sequelize')
     _.merge(this.app.config, lib.FailsafeConfig)
   }
 
@@ -36,40 +41,55 @@ module.exports = class SequelizeTrailpack extends Trailpack {
 
     this.orm = this.orm || {}
     this.app.orm = {}
-    this.connections = lib.Transformer.transformStores(this.app)
-    this.models = lib.Transformer.transformModels(this.app)
+    this.connections = lib.Transformer.transformStoreConnections(this.app)
+    this.app.models = lib.Transformer.transformModels(this.app)
 
-    _.each(this.models, (model, modelName) => {
-      _.each(this.connections, (connection, name) => {
-        if (model.connection == name) {
-          const Model = connection.define(modelName, model.schema, model.config)
+    this.stores = _.mapValues(this.app.config.get('stores'), (store, storeName) => {
+      return {
+        models: _.pickBy(this.app.models, { store: storeName }),
+        connection: this.connections[storeName],
+        migrate: store.migrate || this.app.config.get('models.migrate')
+      }
+    })
 
-          if (model.config) {
-            if (model.config.classMethods) {
-              for (const methodName in model.config.classMethods) {
-                Model[methodName] = model.config.classMethods[methodName]
-              }
-            }
+    // Loop through store models and define them in Sequelize
+    _.each(this.stores, (store, storeName) => {
+      _.each(store.models, (model, modelName) => {
+        const Model = store.connection.define(modelName, model.schema, model.options)
 
-            if (model.config.instanceMethods) {
-              for (const methodName in model.config.instanceMethods) {
-                Model.prototype[methodName] = model.config.instanceMethods[methodName]
-              }
+        if (model.options) {
+          if (model.options.classMethods) {
+            for (const methodName in model.options.classMethods) {
+              Model[methodName] = model.options.classMethods[methodName]
             }
           }
 
-          this.app.orm[model.globalId] = Model
+          if (model.options.instanceMethods) {
+            for (const methodName in model.options.instanceMethods) {
+              Model.prototype[methodName] = model.options.instanceMethods[methodName]
+            }
+          }
         }
+        this.app.orm[model.globalId] = Model
       })
     })
 
-    _.each(this.models, (model, modelName) => {
-      if (!this.app.orm[model.globalId]) return //ignore model if not configured
+    // Loop through store models and associate
+    _.each(this.stores, (store, storeName) => {
+      // Run Associate on the Models
+      _.each(store.models, (model, modelName) => {
+        // ignore model if not configured
+        if (!this.app.orm[model.globalId]) {
+          return
+        }
+        // Associate models if method defined
+        if (this.app.orm[model.globalId].associate) {
+          this.app.orm[model.globalId].associate(this.app.orm)
+        }
 
-      if (this.app.orm[model.globalId].associate)
-        this.app.orm[model.globalId].associate(this.app.orm)
-
-      this.orm[model.globalId.toLowerCase()] = this.app.orm[model.globalId]
+        // Reset the orm Model
+        this.orm[model.globalId.toLowerCase()] = this.app.orm[model.globalId]
+      })
     })
 
     return this.migrate()
@@ -78,31 +98,33 @@ module.exports = class SequelizeTrailpack extends Trailpack {
   /**
    * Close all database connections
    */
-  unload() {
+  async unload() {
     return Promise.all(
-      _.map(this.connections, connection => {
+      _.map(this.stores, store => {
         return new Promise((resolve, reject) => {
-          connection.close()
+          store.connection.close()
           resolve()
         })
       })
     )
   }
 
-  migrate() {
+  async migrate() {
     const SchemaMigrationService = this.app.services.SchemaMigrationService
-    const migrate = this.app.config.get('database.models.migrate')
-
-    if (migrate === 'none') return
 
     return Promise.all(
-      _.map(this.connections, connection => {
-
-        if (migrate === 'drop') {
-          return SchemaMigrationService.dropDB(connection)
+      _.map(this.stores, store => {
+        if (store.migrate === 'drop') {
+          return SchemaMigrationService.dropDB(store.connection)
         }
-        else if (migrate === 'alter') {
-          return SchemaMigrationService.alterDB(connection)
+        else if (store.migrate === 'alter') {
+          return SchemaMigrationService.alterDB(store.connection)
+        }
+        else if (store.migrate === 'none') {
+          return
+        }
+        else {
+          return
         }
       })
     )

@@ -20,20 +20,21 @@ describe('lib.Transformer', () => {
     it('should correctly set the connection', () => {
       const models = lib.Transformer.transformModels(global.app)
 
-      assert.equal(models.User.connection, 'teststore')
-      assert.equal(models.Role.connection, 'storeoverride')
+      assert.equal(models.User.store, 'teststore')
+      assert.equal(models.Role.store, 'storeoverride')
+      assert.equal(models.Override.tableName, 'override')
     })
   })
 
   describe('#transformConnections', () => {
     it('should transform properly', () => {
-      const connections = lib.Transformer.transformStores(global.app)
+      const connections = lib.Transformer.transformStoreConnections(global.app)
 
       assert(connections.teststore)
       assert.equal(connections.storeoverride.options.dialect, 'sqlite')
     })
     it('should transform uri properly', () => {
-      const connections = lib.Transformer.transformStores(global.app)
+      const connections = lib.Transformer.transformStoreConnections(global.app)
       assert(connections.uristore)
       assert.equal(connections.uristore.options.dialect, 'sqlite')
       assert.equal(connections.uristore.options.host, 'testhost')
