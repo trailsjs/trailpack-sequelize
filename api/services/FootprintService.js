@@ -1,7 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
-const Service = require('trails/service')
+const Service = require('trails/lib/Service')
 const ModelError = require('../../lib').ModelError
 
 const manageError = err => {
@@ -39,7 +39,7 @@ module.exports = class FootprintService extends Service {
    */
   create(modelName, values, options) {
     const Model = this._getModel(modelName)
-    const modelOptions = _.defaultsDeep({}, options, _.get(this.app.config, 'footprints.models.options'))
+    const modelOptions = _.defaultsDeep({}, options, this.app.config.get('footprints.models.options'))
     if (!Model) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${modelName} can't be found`))
     }
