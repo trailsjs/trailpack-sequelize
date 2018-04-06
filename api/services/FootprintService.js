@@ -204,6 +204,11 @@ module.exports = class FootprintService extends Service {
     return query.catch(manageError)
   }
 
+  _findNativeAssociation(model, childAttributeName) {
+    return model.associations[childAttributeName] ||
+      model.associations[childAttributeName.charAt(0).toUpperCase() + childAttributeName.slice(1)]
+  }
+
   /**
    * Create a model, and associate it with its parent model.
    *
@@ -219,7 +224,7 @@ module.exports = class FootprintService extends Service {
     if (!parentModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
     }
-    const association = parentModel.associations[childAttributeName]
+    const association = this._findNativeAssociation(parentModel, childAttributeName)
     if (!association) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
     }
@@ -272,7 +277,7 @@ module.exports = class FootprintService extends Service {
     if (!parentModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
     }
-    const association = parentModel.associations[childAttributeName]
+    const association = this._findNativeAssociation(parentModel, childAttributeName)
     if (!association) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
     }
@@ -340,7 +345,7 @@ module.exports = class FootprintService extends Service {
     if (!parentModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
     }
-    const association = parentModel.associations[childAttributeName]
+    const association = this._findNativeAssociation(parentModel, childAttributeName)
     if (!association) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
     }
