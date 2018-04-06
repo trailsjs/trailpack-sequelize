@@ -9,13 +9,13 @@ describe('api.services.FootprintService', () => {
   })
   describe('#create', () => {
     it('should insert a record', () => {
-      return FootprintService.create('Role', {name: 'createtest'})
+      return FootprintService.create('Role', { name: 'createtest' })
         .then(role => {
           assert.equal(role.name, 'createtest')
         })
     })
     it('should insert a record with child', () => {
-      return FootprintService.create('User', {name: 'userTest', roles: [{name: 'roleTest'}]}, {populate: 'roles'})
+      return FootprintService.create('User', { name: 'userTest', roles: [{ name: 'roleTest' }] }, { populate: 'roles' })
         .then(user => {
           assert.equal(user.name, 'userTest')
           assert.equal(user.roles.length, 1)
@@ -23,7 +23,7 @@ describe('api.services.FootprintService', () => {
         })
     })
     it('should return a not found error', () => {
-      return FootprintService.create('UnknowModel', {name: 'userTest'})
+      return FootprintService.create('UnknowModel', { name: 'userTest' })
         .catch(err => {
           assert.equal(err.code, 'E_NOT_FOUND')
           assert.equal(err.message, 'UnknowModel can\'t be found')
@@ -31,12 +31,12 @@ describe('api.services.FootprintService', () => {
         })
     })
     it('should return a validation error', () => {
-      return FootprintService.create('User', {roles: [{name: 'roleTest'}]}, {populate: 'roles'})
+      return FootprintService.create('User', { roles: [{ name: 'roleTest' }] }, { populate: 'roles' })
         .catch(err => {
           assert.equal(err.code, 'E_VALIDATION')
-          assert.equal(err.message, 'notNull Violation: name cannot be null')
+          assert.equal(err.message, 'notNull Violation: User.name cannot be null')
           assert.equal(err.errors[0].path, 'name')
-          assert.equal(err.errors[0].message, 'name cannot be null')
+          assert.equal(err.errors[0].message, 'User.name cannot be null')
           assert.equal(err.errors[0].type, 'notNull Violation')
           assert.equal(err.name, 'Model error')
         })
@@ -44,7 +44,7 @@ describe('api.services.FootprintService', () => {
   })
   describe('#find', () => {
     it('should find a single record', () => {
-      return FootprintService.create('Role', {name: 'findtest'})
+      return FootprintService.create('Role', { name: 'findtest' })
         .then(role => {
           assert.equal(role.name, 'findtest')
           assert(role.id)
@@ -56,11 +56,11 @@ describe('api.services.FootprintService', () => {
         })
     })
     it('should find a set of records', () => {
-      return FootprintService.create('Role', {name: 'findtest'})
+      return FootprintService.create('Role', { name: 'findtest' })
         .then(role => {
           assert.equal(role.name, 'findtest')
           assert(role.id)
-          return FootprintService.find('Role', {name: 'findtest'})
+          return FootprintService.find('Role', { name: 'findtest' })
         })
         .then(roles => {
           assert(roles[0])
@@ -70,7 +70,7 @@ describe('api.services.FootprintService', () => {
     })
 
     it('should return a not found error', () => {
-      return FootprintService.find('UnknowModel', {name: 'findtest'})
+      return FootprintService.find('UnknowModel', { name: 'findtest' })
         .catch(err => {
           assert.equal(err.code, 'E_NOT_FOUND')
           assert.equal(err.message, 'UnknowModel can\'t be found')
@@ -80,14 +80,14 @@ describe('api.services.FootprintService', () => {
   })
   describe('#update', () => {
     it('should update a set of records', () => {
-      return FootprintService.create('Role', {name: 'updatetest'})
+      return FootprintService.create('Role', { name: 'updatetest' })
         .then(role => {
           assert.equal(role.name, 'updatetest')
           assert(role.id)
           return FootprintService.update(
             'Role',
-            {name: 'updatetest'},
-            {name: 'updated'}
+            { name: 'updatetest' },
+            { name: 'updated' }
           )
         })
         .then(results => {
@@ -98,9 +98,9 @@ describe('api.services.FootprintService', () => {
     it('should return a not found error', () => {
       return FootprintService.update(
         'UnknowModel',
-        {name: 'updatetest'},
-        {name: 'updated'}
-        )
+        { name: 'updatetest' },
+        { name: 'updated' }
+      )
         .catch(err => {
           assert.equal(err.code, 'E_NOT_FOUND')
           assert.equal(err.message, 'UnknowModel can\'t be found')
@@ -110,15 +110,15 @@ describe('api.services.FootprintService', () => {
   })
   describe('#destroy', () => {
     it('should delete a set of records', () => {
-      return FootprintService.create('Role', {name: 'destroytest'})
+      return FootprintService.create('Role', { name: 'destroytest' })
         .then(role => {
           assert.equal(role.name, 'destroytest')
           assert(role.id)
-          return FootprintService.destroy('Role', {name: 'destroytest'})
+          return FootprintService.destroy('Role', { name: 'destroytest' })
         })
         .then(nbRowDeleted => {
           assert.equal(nbRowDeleted, 1)
-          return FootprintService.find('Role', {name: 'destroytest'})
+          return FootprintService.find('Role', { name: 'destroytest' })
         })
         .then(roles => {
           assert.equal(roles.length, 0)
@@ -126,7 +126,7 @@ describe('api.services.FootprintService', () => {
     })
 
     it('should return a not found error', () => {
-      return FootprintService.destroy('UnknowModel', {name: 'destroy'})
+      return FootprintService.destroy('UnknowModel', { name: 'destroy' })
         .catch(err => {
           assert.equal(err.code, 'E_NOT_FOUND')
           assert.equal(err.message, 'UnknowModel can\'t be found')
@@ -137,7 +137,7 @@ describe('api.services.FootprintService', () => {
   describe('#createAssociation', () => {
     it('should work for hasOne', () => {
       let projectId
-      return FootprintService.create('Project', {name: 'createassociationhasonetest'})
+      return FootprintService.create('Project', { name: 'createassociationhasonetest' })
         .then(project => {
           assert(project)
           assert(project.id)
@@ -155,7 +155,7 @@ describe('api.services.FootprintService', () => {
 
     it('should work for hasMany', () => {
       let userId
-      return FootprintService.create('User', {name: 'createassociationhasmanytest'})
+      return FootprintService.create('User', { name: 'createassociationhasmanytest' })
         .then(user => {
           assert(user)
           assert(user.id)
@@ -172,23 +172,23 @@ describe('api.services.FootprintService', () => {
     })
 
     it('should work for belongsTo', () => {
-      return FootprintService.create('Page', {name: 'createassociationbelongstotest'})
+      return FootprintService.create('Page', { name: 'createassociationbelongstotest' })
         .then(page => {
           assert(page)
           assert(page.id)
           return FootprintService.createAssociation('Page', page.id, 'Owner', {
             name: 'createassociateduser'
           })
-          .then(user => {
-            return FootprintService.find('Page', page.id)
-              .then(page => assert.equal(page.dataValues.OwnerId, user.id))
-          })
+            .then(user => {
+              return FootprintService.find('Page', page.id)
+                .then(page => assert.equal(page.dataValues.OwnerId, user.id))
+            })
         })
     })
 
     it('should work for belongsToMany', () => {
       let projectId, userId
-      return FootprintService.create('project', {name: 'createassociationbelongstomanytest'})
+      return FootprintService.create('project', { name: 'createassociationbelongstomanytest' })
         .then(project => {
           assert(project)
           assert(project.id)
@@ -218,7 +218,7 @@ describe('api.services.FootprintService', () => {
   describe('#findAssociation', () => {
     it('should work for hasOne', () => {
       let projectId
-      return FootprintService.create('Project', {name: 'createassociationhasonetest'})
+      return FootprintService.create('Project', { name: 'createassociationhasonetest' })
         .then(project => {
           assert(project)
           assert(project.id)
@@ -243,7 +243,7 @@ describe('api.services.FootprintService', () => {
 
     it('should work for hasMany', () => {
       let userId
-      return FootprintService.create('User', {name: 'findassociationtest'})
+      return FootprintService.create('User', { name: 'findassociationtest' })
         .then(user => {
           assert(user)
           assert(user.id)
@@ -267,7 +267,7 @@ describe('api.services.FootprintService', () => {
 
     it('should work for belongsTo', () => {
       let pageId
-      return FootprintService.create('Page', {name: 'findassociationbelongstotest'})
+      return FootprintService.create('Page', { name: 'findassociationbelongstotest' })
         .then(page => {
           assert(page)
           assert(page.id)
@@ -286,16 +286,16 @@ describe('api.services.FootprintService', () => {
 
     it('should work for belongsToMany', () => {
       let projectId, userId
-      return FootprintService.create('Project', {name: 'findassociationbelongstotest'})
+      return FootprintService.create('Project', { name: 'findassociationbelongstotest' })
         .then(project => {
           assert(project.id)
           projectId = project.id
-          return FootprintService.create('User', {name: 'findassociateduser'})
+          return FootprintService.create('User', { name: 'findassociateduser' })
         })
         .then(user => {
           assert(user.id)
           userId = user.id
-          return FootprintService.create('UserProject', {UserId: user.id, ProjectId: projectId})
+          return FootprintService.create('UserProject', { UserId: user.id, ProjectId: projectId })
         })
         .then(userproject => {
           return FootprintService.findAssociation('Project', projectId, 'Users')
@@ -305,13 +305,13 @@ describe('api.services.FootprintService', () => {
 
     it('should join criteria with an and clause for belongsToMany', () => {
       let projectId
-      return FootprintService.create('Project', {name: 'findassociationbelongstotest'})
+      return FootprintService.create('Project', { name: 'findassociationbelongstotest' })
         .then(project => {
           assert(project.id)
           projectId = project.id
-          return FootprintService.create('User', {name: 'findunassociateduser'})
+          return FootprintService.create('User', { name: 'findunassociateduser' })
         })
-        .then(user=> {
+        .then(user => {
           return FootprintService.findAssociation('Project', projectId, 'Users', {
             id: user.id
           })
@@ -323,7 +323,7 @@ describe('api.services.FootprintService', () => {
   describe('#updateAssociation', () => {
     it('should work for hasOne', () => {
       let projectId
-      return FootprintService.create('Project', {name: 'updateassociationhasonetest'})
+      return FootprintService.create('Project', { name: 'updateassociationhasonetest' })
         .then(project => {
           assert(project)
           assert(project.id)
@@ -335,7 +335,7 @@ describe('api.services.FootprintService', () => {
         .then(page => {
           assert(page)
           assert(page.id)
-          return FootprintService.updateAssociation('Project', projectId, 'Page', {}, {name: 'updateassociatedpage'})
+          return FootprintService.updateAssociation('Project', projectId, 'Page', {}, { name: 'updateassociatedpage' })
         })
         .then(() => {
           return FootprintService.findAssociation('Project', projectId, 'Page')
@@ -347,7 +347,7 @@ describe('api.services.FootprintService', () => {
 
     it('should work for hasMany', () => {
       let userId
-      return FootprintService.create('User', {name: 'updateassociationhasmanytest'})
+      return FootprintService.create('User', { name: 'updateassociationhasmanytest' })
         .then(user => {
           assert(user)
           assert(user.id)
@@ -359,7 +359,7 @@ describe('api.services.FootprintService', () => {
         .then(role => {
           assert(role)
           assert(role.id)
-          return FootprintService.updateAssociation('User', userId, 'roles', {}, {name: 'updateassociatedrole'})
+          return FootprintService.updateAssociation('User', userId, 'roles', {}, { name: 'updateassociatedrole' })
         })
         .then(() => {
           return FootprintService.findAssociation('User', userId, 'roles')
@@ -371,7 +371,7 @@ describe('api.services.FootprintService', () => {
 
     it('should work for belongsTo', () => {
       let pageId
-      return FootprintService.create('Page', {name: 'updateassociationbelongstotest'})
+      return FootprintService.create('Page', { name: 'updateassociationbelongstotest' })
         .then(page => {
           assert(page.id)
           pageId = page.id
@@ -381,7 +381,7 @@ describe('api.services.FootprintService', () => {
         })
         .then(user => {
           assert(user.id)
-          return FootprintService.updateAssociation('Page', pageId, 'Owner', {}, {name: 'updatedassociatedowner'})
+          return FootprintService.updateAssociation('Page', pageId, 'Owner', {}, { name: 'updatedassociatedowner' })
         })
         .then(() => {
           return FootprintService.findAssociation('Page', pageId, 'Owner')
@@ -391,18 +391,18 @@ describe('api.services.FootprintService', () => {
 
     it('should work for belongsToMany', () => {
       let projectId
-      return FootprintService.create('Project', {name: 'updatebelongstomanytest'})
+      return FootprintService.create('Project', { name: 'updatebelongstomanytest' })
         .then(project => {
           assert(project.id)
           projectId = project.id
-          return FootprintService.create('User', {name: 'originalassociateduser'})
+          return FootprintService.create('User', { name: 'originalassociateduser' })
         })
         .then(user => {
           assert(user.id)
-          return FootprintService.create('UserProject', {UserId: user.id, ProjectId: projectId})
+          return FootprintService.create('UserProject', { UserId: user.id, ProjectId: projectId })
         })
         .then(userproject => {
-          return FootprintService.updateAssociation('Project', projectId, 'Users', {}, {name: 'updatedassociateduser'})
+          return FootprintService.updateAssociation('Project', projectId, 'Users', {}, { name: 'updatedassociateduser' })
         })
         .then(updated => {
           return FootprintService.findAssociation('Project', projectId, 'Users')
@@ -416,7 +416,7 @@ describe('api.services.FootprintService', () => {
   describe('#destroyAssociation', () => {
     it('should delete an associated record', () => {
       let userId
-      return FootprintService.create('User', {name: 'destroyassociationtest'})
+      return FootprintService.create('User', { name: 'destroyassociationtest' })
         .then(user => {
           assert(user)
           assert(user.id)
@@ -432,7 +432,7 @@ describe('api.services.FootprintService', () => {
         })
         .then(roles => {
           assert(roles)
-          return FootprintService.find('User', userId, {populate: 'roles'})
+          return FootprintService.find('User', userId, { populate: 'roles' })
         })
         .then(user => {
           assert.equal(user.roles.length, 0)
