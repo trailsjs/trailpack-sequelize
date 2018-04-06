@@ -219,7 +219,9 @@ module.exports = class FootprintService extends Service {
     if (!parentModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
     }
-    const association = parentModel.associations[childAttributeName]
+    const association = parentModel.associations[childAttributeName] ||
+      parentModel.associations[childAttributeName.charAt(0).toUpperCase() + childAttributeName.slice(1)]
+
     if (!association) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
     }
@@ -272,7 +274,9 @@ module.exports = class FootprintService extends Service {
     if (!parentModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
     }
-    const association = parentModel.associations[childAttributeName]
+    const association = parentModel.associations[childAttributeName] ||
+      parentModel.associations[childAttributeName.charAt(0).toUpperCase() + childAttributeName.slice(1)]
+
     if (!association) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
     }
@@ -340,7 +344,9 @@ module.exports = class FootprintService extends Service {
     if (!parentModel) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName} can't be found`))
     }
-    const association = parentModel.associations[childAttributeName]
+    const association = parentModel.associations[childAttributeName] ||
+      parentModel.associations[childAttributeName.charAt(0).toUpperCase() + childAttributeName.slice(1)]
+
     if (!association) {
       return Promise.reject(new ModelError('E_NOT_FOUND', `${parentModelName}'s association ${childAttributeName} can't be found`))
     }
